@@ -1,0 +1,7 @@
+github.com/wselwood/gompcreader v0.0.0-20150408061244-a138baf7915d h1:ME/RpdEq34fBSoWATcmFG4hvvyFXvVjGVegst0BjgBM=
+github.com/wselwood/gompcreader v0.0.0-20150408061244-a138baf7915d/go.mod h1:62xo4xKrGVZEoJDK3LtmQy07pJm7i/VUx/VXxs2sNXY=
+golang.org/x/exp v0.0.0-20180321215751-8460e604b9de h1:xSjD6HQTqT0H/k60N5yYBtnN1OEkVy7WIo/DYyxKRO0=
+golang.org/x/exp v0.0.0-20180321215751-8460e604b9de/go.mod h1:CJ0aWSM057203Lf6IL+f9T1iT9GByDxfZKAQTCR3kQA=
+golang.org/x/tools v0.0.0-20180525024113-a5b4c53f6e8b/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
+gonum.org/v1/gonum v0.0.0-20181029232933-400065bf7646 h1:P1EVWJP/s4XiEpDOMMS9RhsAwGnm7U4pzKn8snIub9s=
+gonum.org/v1/gonum v0.0.0-20181029232933-400065bf7646/go.mod h1:Y+Yx5eoAFn32cQvJDxZx5Dpnq+c3wtXuadVZAcxbbBo=
