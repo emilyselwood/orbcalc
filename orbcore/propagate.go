@@ -1,6 +1,7 @@
 package orbcore
 
 import (
+	"log"
 	"math"
 )
 
@@ -139,7 +140,7 @@ func newtonKepler(x0 float64, m float64, orbitalEccentricity float64) float64 {
 
 func newton(x0 float64, m float64, orbitalEccentricity float64, factor func(float64, float64, float64) float64) float64 {
 	p0 := 1.0 * x0
-	for i := 0; i < 50; i++ { // max number of iterations to do
+	for i := 0; i < 100; i++ { // max number of iterations to do
 
 		p := p0 - factor(orbitalEccentricity, p0, m)
 		if math.Abs(p-p0) < 1.48e-8 {
@@ -147,6 +148,6 @@ func newton(x0 float64, m float64, orbitalEccentricity float64, factor func(floa
 		}
 		p0 = p
 	}
-
-	panic("newton did not converge")
+	log.Println("newton did not converge")
+	return 1
 }
