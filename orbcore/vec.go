@@ -33,9 +33,10 @@ func Rotate(vec *mat.VecDense, angle float64, axis Axis) *mat.VecDense {
 /*
 RotationMatrixForOrbit creates a rotation matrix that is the three rotations we need for sorting out an orbit vector
 Using this means we have to 4 matrix multiplications rather than 6
+
+If this is in the hot path of your code consider using QuickerRotationMatrixForOrbit instead.
 */
 func RotationMatrixForOrbit(angleZ1, angleX, angleZ2 float64) *mat.Dense {
-	// TODO: there is probably a way to do this with out the matrix multiply by building the values for each cell.
 	rot := RotationMatrix(angleZ1, AxisZ)
 	rot.Mul(rot, RotationMatrix(angleX, AxisX))
 	rot.Mul(rot, RotationMatrix(angleZ2, AxisZ))
@@ -53,7 +54,7 @@ func QuickerRotationMatrixForOrbit(angleZ1, angleX, angleZ2 float64) *mat.Dense 
 	z2c := math.Cos(angleZ2)
 	z2s := math.Sin(angleZ2)
 
-	// TODO: simplify out the zeros
+	// TODO: simplify out the zeros. Left in for now to make the fomula easier to validate.
 	a := ((z1c * 1 * z2c) + ((-z1s) * 0 * z2c) + (0 * xs * z2c)) +
 		((z1c * 0 * z2s) + ((-z1s) * xc * z2s) + (0 * 0 * z2s)) +
 		((z1c * 0 * 0) + ((-z1s) * (-xs) * 0) + (0 * xc * 0))

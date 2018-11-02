@@ -19,13 +19,32 @@ type Orbit struct {
 	AbsoluteMagnitude           float64
 	Slope                       float64
 	Epoch                       time.Time
-	MeanAnomalyEpoch            float64
-	ArgumentOfPerihelion        float64
-	LongitudeOfTheAscendingNode float64
-	InclinationToTheEcliptic    float64
-	OrbitalEccentricity         float64
+	MeanAnomalyEpoch            float64 // nu
+	ArgumentOfPerihelion        float64 // w argp
+	LongitudeOfTheAscendingNode float64 // omega raan
+	InclinationToTheEcliptic    float64 // i inc
+	OrbitalEccentricity         float64 // e ecc
 	MeanDailyMotion             float64
-	SemimajorAxis               float64
+	SemimajorAxis               float64 // a p
+}
+
+/*
+Clone makes a copy of this orbit object
+*/
+func (o *Orbit) Clone() *Orbit {
+	return &Orbit{
+		ID:                          o.ID,
+		AbsoluteMagnitude:           o.AbsoluteMagnitude,
+		Slope:                       o.Slope,
+		Epoch:                       o.Epoch,
+		MeanAnomalyEpoch:            o.MeanAnomalyEpoch,
+		ArgumentOfPerihelion:        o.ArgumentOfPerihelion,
+		LongitudeOfTheAscendingNode: o.LongitudeOfTheAscendingNode,
+		InclinationToTheEcliptic:    o.InclinationToTheEcliptic,
+		OrbitalEccentricity:         o.OrbitalEccentricity,
+		MeanDailyMotion:             o.MeanDailyMotion,
+		SemimajorAxis:               o.SemimajorAxis,
+	}
 }
 
 /*
@@ -45,13 +64,15 @@ func OrbitToVector(orbit *Orbit) (mat.Vector, mat.Vector) {
 
 	r, v := OrbitToVecPerifocal(orbit)
 
-	rot := RotationMatrixForOrbit(orbit.ArgumentOfPerihelion, orbit.InclinationToTheEcliptic, orbit.LongitudeOfTheAscendingNode)
+	rot := QuickerRotationMatrixForOrbit(orbit.ArgumentOfPerihelion, orbit.InclinationToTheEcliptic, orbit.LongitudeOfTheAscendingNode)
 
 	r.MulVec(rot, r)
 	v.MulVec(rot, v)
 
 	return r, v
 }
+
+// TODO: VectorToOrbit
 
 /*
 OrbitToVecPerifocal converts a MinorPlanet object into r and v vectors in the perifocal frame
