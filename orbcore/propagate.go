@@ -1,6 +1,7 @@
 package orbcore
 
 import (
+	"fmt"
 	"log"
 	"math"
 )
@@ -27,7 +28,7 @@ func MeanMotion(parent float64, orbit *Orbit, time int64) *Orbit {
 	return r
 }
 
-const delta = 1e-2
+const delta = 1e-3
 const tolerance = 1e-16
 
 func createM0(orbit *Orbit) float64 {
@@ -53,7 +54,6 @@ func mtoMeanAnomaly(m float64, orbit *Orbit) float64 {
 		e := newtonKepler(m, m, orbit.OrbitalEccentricity)
 		return 2 * math.Atan(math.Sqrt((1+orbit.OrbitalEccentricity)/(1-orbit.OrbitalEccentricity))*math.Tan(e/2))
 	} else {
-		// TODO: implement
 		b := 3.0 * m / 2.0
 		a := (b + (1.0 + math.Pow(math.Pow(math.Pow(b, 2), 0.5), (2.0/3.0))))
 
@@ -67,15 +67,16 @@ func mtoMeanAnomaly(m float64, orbit *Orbit) float64 {
 func keplerParabolic(orbitalEccentricity float64, d float64) float64 {
 
 	x := (orbitalEccentricity - 1) / (orbitalEccentricity + 1) * math.Pow(d, 2)
+
 	done := false
 	s := 0.0
-	k := 0
-
+	k := 0.0
+	fmt.Println(orbitalEccentricity, ",", d)
 	for !done {
-		term := (orbitalEccentricity - 1.0/(2.0*float64(k)+3.0)) * math.Pow(x, float64(k))
+		term := (orbitalEccentricity - 1.0/(2.0*k+3.0)) * math.Pow(x, k)
 		done = math.Abs(term) < tolerance
 		s += term
-		k++
+		k = k + 1.0
 	}
 
 	return math.Sqrt(2.0/(1.0+orbitalEccentricity))*d + math.Sqrt(2.0/math.Pow((1.0+orbitalEccentricity), 3))*math.Pow(d, 3)*s

@@ -1,3 +1,5 @@
+github.com/paulbellamy/ratecounter v0.2.0 h1:2L/RhJq+HA8gBQImDXtLPrDXK5qAj6ozWVK/zFXVJGs=
+github.com/paulbellamy/ratecounter v0.2.0/go.mod h1:Hfx1hDpSGoqxkVVpBi/IlYD7kChlfo5C6hzIHwPqfFE=
 github.com/wselwood/gompcreader v0.0.0-20150408061244-a138baf7915d h1:ME/RpdEq34fBSoWATcmFG4hvvyFXvVjGVegst0BjgBM=
 github.com/wselwood/gompcreader v0.0.0-20150408061244-a138baf7915d/go.mod h1:62xo4xKrGVZEoJDK3LtmQy07pJm7i/VUx/VXxs2sNXY=
 golang.org/x/exp v0.0.0-20180321215751-8460e604b9de h1:xSjD6HQTqT0H/k60N5yYBtnN1OEkVy7WIo/DYyxKRO0=

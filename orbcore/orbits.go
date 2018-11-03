@@ -4,6 +4,7 @@ Package orbcore provides functions to work out orbital details for an asronomica
 package orbcore
 
 import (
+	"fmt"
 	"math"
 	"time"
 
@@ -45,6 +46,18 @@ func (o *Orbit) Clone() *Orbit {
 		MeanDailyMotion:             o.MeanDailyMotion,
 		SemimajorAxis:               o.SemimajorAxis,
 	}
+}
+
+func (o *Orbit) String() string {
+	return fmt.Sprintf("id: \"%v\" nu: %v w: %v omega: %v i: %v e: %v a: %v",
+		o.ID,
+		o.MeanAnomalyEpoch,
+		o.ArgumentOfPerihelion,
+		o.LongitudeOfTheAscendingNode,
+		o.InclinationToTheEcliptic,
+		o.OrbitalEccentricity,
+		o.SemimajorAxis,
+	)
 }
 
 /*
