@@ -55,7 +55,7 @@ func mtoMeanAnomaly(m float64, orbit *Orbit) float64 {
 		return 2 * math.Atan(math.Sqrt((1+orbit.OrbitalEccentricity)/(1-orbit.OrbitalEccentricity))*math.Tan(e/2))
 	} else {
 		b := 3.0 * m / 2.0
-		a := (b + (1.0 + math.Pow(math.Pow(math.Pow(b, 2), 0.5), (2.0/3.0))))
+		a := (b + (1 + math.Pow(math.Pow(math.Pow(b, 2), 0.5), (2.0/3.0))))
 
 		guess := 2 * a * b / (1 + a + math.Pow(a, 2))
 		d := newtonKeplerParabolic(guess, m, orbit.OrbitalEccentricity)

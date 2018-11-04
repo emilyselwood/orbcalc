@@ -3,18 +3,17 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"runtime/pprof"
 	"sync"
 	"time"
-	"io"
 
 	"github.com/wselwood/gompcreader"
 	"github.com/wselwood/orbcalc/orbconvert"
 	"github.com/wselwood/orbcalc/orbcore"
 	"github.com/wselwood/orbcalc/orbdata"
-	"gonum.org/v1/gonum/mat"
 
 	"github.com/paulbellamy/ratecounter"
 )
@@ -95,7 +94,7 @@ func main() {
 
 	complete.Wait()
 	log.Println("done")
-	
+
 }
 
 func stageRead(inputfile string, target int, skip int, output chan *orbcore.Orbit, wg *sync.WaitGroup, counter *ratecounter.RateCounter) {
@@ -132,17 +131,17 @@ func stageRead(inputfile string, target int, skip int, output chan *orbcore.Orbi
 
 func stageMeanMotion(in chan *orbcore.Orbit, output chan *orbcore.Orbit, wg *sync.WaitGroup, counter *ratecounter.RateCounter) {
 	defer wg.Done()
-	
+
 	for orb := range in {
 		output <- orbcore.MeanMotion(orbdata.SunGrav, orb, 1*24*60*60)
 		counter.Incr(1)
 	}
-	
+
 }
 
 func stageOutput(outputPath string, in chan *orbcore.Orbit, wg *sync.WaitGroup, counter *ratecounter.RateCounter) {
 	defer wg.Done()
-	
+
 	f, err := os.Create(outputPath)
 	if err != nil {
 		log.Fatal("error creating outputfile ", err)
@@ -150,9 +149,10 @@ func stageOutput(outputPath string, in chan *orbcore.Orbit, wg *sync.WaitGroup, 
 	defer f.Close()
 	for orb := range in {
 		r, _ := orbcore.OrbitToVector(orb)
-		fmt.Fprintf(f, "%s,%v\n", orb.ID, mat.Formatted(r.T(), mat.Prefix(""), mat.Squeeze()))
+		fmt.Fprintf(f, "%s,%f,%f,%f\n", orb.ID, r.AtVec(0), r.AtVec(1), r.AtVec(2))
+
+		//fmt.Fprintln(f, "%s,%v\n", orb.ID, mat.Formatted(r.T(), mat.Prefix(""), mat.Squeeze()))
 		counter.Incr(1)
 	}
 
-	
 }

@@ -44,7 +44,9 @@ func RotationMatrixForOrbit(angleZ1, angleX, angleZ2 float64) *mat.Dense {
 }
 
 /*
-QuickerRotationMatrixForOrbit builds a rotation matrix for an orbit by manually doing the
+QuickerRotationMatrixForOrbit builds a rotation matrix for an orbit by manually doing the matrix multiplication
+This is a lot faster than the RotationMatrixForOrbit.
+
 */
 func QuickerRotationMatrixForOrbit(angleZ1, angleX, angleZ2 float64) *mat.Dense {
 	z1c := math.Cos(angleZ1)
