@@ -12,6 +12,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/wselwood/orbcalc/orbcore"
 	"github.com/wselwood/orbcalc/orbdata"
@@ -27,6 +28,8 @@ var testObjects = []*orbcore.Orbit{
 		OrbitalEccentricity:         0.9901593,
 		SemimajorAxis:               3.79035922723884e+10,
 	},
+	// TODO: More objects at least ceries and pluto as test cases
+
 }
 
 func main() {
@@ -49,7 +52,7 @@ func main() {
 
 func processOrbit(orb *orbcore.Orbit, outDir string) error {
 
-	f, err := os.Create(filepath.Join(outDir, orb.ID+".csv"))
+	f, err := os.Create(filepath.Join(outDir, cleanID(orb.ID)+".csv"))
 	if err != nil {
 		return err
 	}
@@ -64,4 +67,9 @@ func processOrbit(orb *orbcore.Orbit, outDir string) error {
 	}
 
 	return nil
+}
+
+// Spaces are a pain in paths. Swap them for underscores.
+func cleanID(id string) string {
+	return strings.Replace(id, " ", "_", -1)
 }
