@@ -7,9 +7,11 @@ from poliastro.plotting import OrbitPlotter, plot
 
 def process(name, orbit, path):
     f = open(name.replace(" ", "_") + ".csv","w+")
-    for i in range(1, 366):
-
-        r = orbit.propagate(i * u.day).state.r
+    for i in range(0, 366):
+        if i == 0:
+            r = orbit.state.r
+        else :
+            r = orbit.propagate(i * u.day).state.r
         f.write("{},{},{},{},{}\n".format(name, i, r[0].value, r[1].value, r[2].value))
     f.close()
 

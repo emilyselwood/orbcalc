@@ -59,9 +59,14 @@ func processOrbit(orb *orbcore.Orbit, outDir string) error {
 
 	defer f.Close()
 
-	for i := 1; i <= 365; i++ { // loop for a year of days
+	for i := 0; i <= 365; i++ { // loop for a year of days
 		seconds := int64(i * (24 * 60 * 60)) // seconds per day
-		updated := orbcore.MeanMotion(orbdata.SunGrav, orb, seconds)
+		var updated *orbcore.Orbit
+		if i > 0 {
+			updated = orbcore.MeanMotion(orbdata.SunGrav, orb, seconds)
+		} else {
+			updated = orb
+		}
 		r, _ := orbcore.OrbitToVector(updated)
 		fmt.Fprintf(f, "%v,%v,%v,%v,%v\n", orb.ID, i, r.AtVec(0), r.AtVec(1), r.AtVec(2))
 	}
