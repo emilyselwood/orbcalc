@@ -28,8 +28,16 @@ var testObjects = []*orbcore.Orbit{
 		OrbitalEccentricity:         0.9901593,
 		SemimajorAxis:               3.79035922723884e+10,
 	},
-	// TODO: More objects at least ceries and pluto as test cases
-
+	{
+		ID:                          "1", // Ceres
+		MeanAnomalyEpoch:            6.147582300011738,
+		ArgumentOfPerihelion:        1.2761023695175595,
+		LongitudeOfTheAscendingNode: 1.4016725260132445,
+		InclinationToTheEcliptic:    0.1848916288429445,
+		OrbitalEccentricity:         0.0755347,
+		SemimajorAxis:               4.1394459238740003e+08,
+	},
+	// TODO: More objects at least vesta and pluto as test cases
 }
 
 func main() {
@@ -67,8 +75,9 @@ func processOrbit(orb *orbcore.Orbit, outDir string) error {
 		} else {
 			updated = orb
 		}
-		r, _ := orbcore.OrbitToVector(updated)
-		fmt.Fprintf(f, "%v,%v,%v,%v,%v\n", orb.ID, i, r.AtVec(0), r.AtVec(1), r.AtVec(2))
+		p := orbcore.OrbitToPosition(updated)
+		p.Day = i
+		fmt.Fprintln(f, p)
 	}
 
 	return nil
