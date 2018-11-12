@@ -42,9 +42,9 @@ func main() {
 		sum += d
 	}
 
-	log.Printf("sum: %v count: %v ave: %v\n", sum, count, sum/count)
+	log.Printf("difference sum: %v count: %v ave: %v\n", sum, count, sum/(count*3))
 }
 
 func compareRows(a *orbcore.Position, b *orbcore.Position) float64 {
-	return (math.Abs(a.X-b.X) + math.Abs(a.Y-b.Y) + math.Abs(a.Z-b.Z)) / 3
+	return (math.Abs(a.X-b.X) + math.Abs(a.Y-b.Y) + math.Abs(a.Z-b.Z))
 }
