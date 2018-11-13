@@ -77,10 +77,20 @@ func OrbitToVector(orbit *Orbit) (mat.Vector, mat.Vector) {
 
 	r, v := OrbitToVecPerifocal(orbit)
 
-	rot := QuickerRotationMatrixForOrbit(orbit.ArgumentOfPerihelion, orbit.InclinationToTheEcliptic, orbit.LongitudeOfTheAscendingNode)
+	/*
+		TODO: Fix this and put it back in some day.
+		rot := QuickerRotationMatrixForOrbit(orbit.ArgumentOfPerihelion, orbit.InclinationToTheEcliptic, orbit.LongitudeOfTheAscendingNode)
 
-	r.MulVec(rot, r)
-	v.MulVec(rot, v)
+		r.MulVec(rot, r)
+		v.MulVec(rot, v)
+	*/
+	r = Rotate(r, orbit.ArgumentOfPerihelion, AxisZ)
+	r = Rotate(r, orbit.InclinationToTheEcliptic, AxisX)
+	r = Rotate(r, orbit.LongitudeOfTheAscendingNode, AxisZ)
+
+	v = Rotate(v, orbit.ArgumentOfPerihelion, AxisZ)
+	v = Rotate(v, orbit.InclinationToTheEcliptic, AxisX)
+	v = Rotate(v, orbit.LongitudeOfTheAscendingNode, AxisZ)
 
 	return r, v
 }
@@ -92,17 +102,18 @@ OrbitToVecPerifocal converts a MinorPlanet object into r and v vectors in the pe
 */
 func OrbitToVecPerifocal(orbit *Orbit) (*mat.VecDense, *mat.VecDense) {
 
+	a := orbit.SemimajorAxis * (1 - math.Pow(orbit.OrbitalEccentricity, 2))
 	cosNu := math.Cos(orbit.MeanAnomalyEpoch)
 	sinNu := math.Sin(orbit.MeanAnomalyEpoch)
 
 	r := mat.NewVecDense(3, []float64{cosNu, sinNu, 0 * orbit.MeanAnomalyEpoch})
 
-	rMult := orbit.SemimajorAxis / (1 + orbit.OrbitalEccentricity*cosNu)
+	rMult := a / (1 + orbit.OrbitalEccentricity*cosNu)
 	r.ScaleVec(rMult, r)
 
 	v := mat.NewVecDense(3, []float64{-sinNu, orbit.OrbitalEccentricity + cosNu, 0})
 
-	vMult := math.Sqrt(orbdata.SunGrav / orbit.SemimajorAxis)
+	vMult := math.Sqrt(orbdata.SunGrav / a)
 	v.ScaleVec(vMult, v)
 
 	return r, v

@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/wselwood/orbcalc/orbcore"
 	"github.com/wselwood/orbcalc/orbdata"
@@ -20,7 +21,8 @@ import (
 
 var testObjects = []*orbcore.Orbit{
 	{
-		ID:                          "1996 PW",
+		ID:                          "1996 PW",                                   // Very very eliptical that can cause problems.
+		Epoch:                       time.Date(2018, 1, 1, 0, 0, 0, 0, time.UTC), // todo: real epoch times.
 		MeanAnomalyEpoch:            0.03539440456581901,
 		ArgumentOfPerihelion:        3.169512336568096,
 		LongitudeOfTheAscendingNode: 2.519967809619083,
@@ -29,7 +31,8 @@ var testObjects = []*orbcore.Orbit{
 		SemimajorAxis:               3.79035922723884e+10,
 	},
 	{
-		ID:                          "1", // Ceres
+		ID:                          "1",                                         // Ceres
+		Epoch:                       time.Date(2018, 1, 1, 0, 0, 0, 0, time.UTC), // todo: real epoch times.
 		MeanAnomalyEpoch:            6.147582300011738,
 		ArgumentOfPerihelion:        1.2761023695175595,
 		LongitudeOfTheAscendingNode: 1.4016725260132445,
@@ -68,15 +71,17 @@ func processOrbit(orb *orbcore.Orbit, outDir string) error {
 	defer f.Close()
 
 	for i := 0; i <= 365; i++ { // loop for a year of days
-		seconds := int64(i * (24 * 60 * 60)) // seconds per day
+		duration := time.Duration(i) * (time.Hour * 24) // all in UTC so no DST changes or other weirdness that stops us having constant days.
 		var updated *orbcore.Orbit
 		if i > 0 {
-			updated = orbcore.MeanMotion(orbdata.SunGrav, orb, seconds)
+			updated = orbcore.MeanMotion(orbdata.SunGrav, orb, duration)
 		} else {
 			updated = orb
+			r, v := orbcore.OrbitToVector(updated)
+			fmt.Println(orb.ID, "r:", r)
+			fmt.Println(orb.ID, "v:", v)
 		}
 		p := orbcore.OrbitToPosition(updated)
-		p.Day = i
 		fmt.Fprintln(f, p)
 	}
 

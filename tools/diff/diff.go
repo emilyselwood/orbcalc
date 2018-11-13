@@ -2,13 +2,12 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"math"
 
 	"github.com/wselwood/orbcalc/orbcore"
 )
-
-// TODO: put this somewhere common.
 
 func main() {
 	inA := flag.String("a", "", "first file to compare")
@@ -38,6 +37,7 @@ func main() {
 	count := 0.0
 	for i, a := range aRows {
 		d := compareRows(a, bRows[i])
+		fmt.Printf("%v: %v\n", count, d/3)
 		count++
 		sum += d
 	}

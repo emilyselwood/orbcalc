@@ -4,26 +4,28 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"time"
 )
 
 /*
-MeanMotion uses the mean motion method to propgate [orbit] through [time] seconds around [parent].
+MeanMotion uses the mean motion method to propgate [orbit] through [t] seconds around [parent].
 */
-func MeanMotion(parent float64, orbit *Orbit, time int64) *Orbit {
+func MeanMotion(parent float64, orbit *Orbit, t time.Duration) *Orbit {
 	m0 := createM0(orbit)
 	var newMeanAnomalyEpoch float64
 	if math.Abs(orbit.OrbitalEccentricity-1) > delta {
 		a := orbit.SemimajorAxis / (1 - math.Pow(orbit.OrbitalEccentricity, 2))
-		m := m0 + float64(time)*math.Sqrt(parent/math.Abs(math.Pow(a, 3)))
+		m := m0 + float64(t.Seconds())*math.Sqrt(parent/math.Abs(math.Pow(a, 3)))
 		newMeanAnomalyEpoch = mtoMeanAnomaly(m, orbit)
 	} else {
 		q := orbit.SemimajorAxis * math.Abs(1.0-orbit.OrbitalEccentricity) / math.Abs(1.0-math.Pow(orbit.OrbitalEccentricity, 2))
-		m := m0 + float64(time)*math.Sqrt(parent/2.0/math.Pow(q, 3))
+		m := m0 + float64(t.Seconds())*math.Sqrt(parent/2.0/math.Pow(q, 3))
 		newMeanAnomalyEpoch = mtoMeanAnomaly(m, orbit)
 	}
 
 	r := orbit.Clone()
 	r.MeanAnomalyEpoch = newMeanAnomalyEpoch
+	r.Epoch = r.Epoch.Add(t)
 
 	return r
 }

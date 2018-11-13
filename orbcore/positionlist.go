@@ -7,21 +7,22 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 /*
 Position contains information about the location in space of an object
 */
 type Position struct {
-	ID  string
-	Day int
-	X   float64
-	Y   float64
-	Z   float64
+	ID    string
+	Epoch time.Time
+	X     float64
+	Y     float64
+	Z     float64
 }
 
 func (p *Position) String() string {
-	return fmt.Sprintf("%v,%v,%v,%v,%v", p.ID, p.Day, p.X, p.Y, p.Z)
+	return fmt.Sprintf("%v,%v,%v,%v,%v", p.ID, p.Epoch.Format(time.RFC3339), p.X, p.Y, p.Z)
 }
 
 /*
@@ -30,11 +31,11 @@ OrbitToPosition converts an object object to its position on day 0
 func OrbitToPosition(orb *Orbit) *Position {
 	r, _ := OrbitToVector(orb)
 	return &Position{
-		ID:  orb.ID,
-		Day: 0,
-		X:   r.AtVec(0),
-		Y:   r.AtVec(1),
-		Z:   r.AtVec(2),
+		ID:    orb.ID,
+		Epoch: orb.Epoch,
+		X:     r.AtVec(0),
+		Y:     r.AtVec(1),
+		Z:     r.AtVec(2),
 	}
 }
 
@@ -92,7 +93,7 @@ func ParsePositionLine(line string) (*Position, error) {
 
 	parts := strings.Split(line, ",")
 
-	i, err := strconv.Atoi(parts[1])
+	i, err := parseTime(parts[1])
 	if err != nil {
 		return nil, err
 	}
@@ -111,11 +112,23 @@ func ParsePositionLine(line string) (*Position, error) {
 	}
 
 	result := Position{
-		ID:  parts[0],
-		Day: i,
-		X:   x,
-		Y:   y,
-		Z:   z,
+		ID:    parts[0],
+		Epoch: *i,
+		X:     x,
+		Y:     y,
+		Z:     z,
 	}
 	return &result, nil
+}
+
+// Try a couple of different time formats to make it easier to deal with other languages files.
+func parseTime(in string) (*time.Time, error) {
+	i, err := time.Parse(time.RFC3339, in)
+	if err != nil {
+		i, err = time.Parse("2006-01-02T15:04:05.999", in)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &i, nil
 }

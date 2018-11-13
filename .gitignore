@@ -1,5 +1,11 @@
 *.pprof
 *.exe
 orbcalc
+tools/verification/verification
+tools/diff/diff
+tools/plot/plot
 output.txt
+out.txt
 *.csv
+*.png
+.vscode/
