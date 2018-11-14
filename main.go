@@ -133,7 +133,7 @@ func stageMeanMotion(in chan *orbcore.Orbit, output chan *orbcore.Orbit, wg *syn
 	defer wg.Done()
 
 	for orb := range in {
-		output <- orbcore.MeanMotion(orbdata.SunGrav, orb, 1*24*60*60)
+		output <- orbcore.MeanMotion(orbdata.SunGrav, orb, time.Duration(24)*time.Hour)
 		counter.Incr(1)
 	}
 
@@ -148,8 +148,8 @@ func stageOutput(outputPath string, in chan *orbcore.Orbit, wg *sync.WaitGroup, 
 	}
 	defer f.Close()
 	for orb := range in {
-		r, _ := orbcore.OrbitToVector(orb)
-		fmt.Fprintf(f, "%s,%f,%f,%f\n", orb.ID, r.AtVec(0), r.AtVec(1), r.AtVec(2))
+		r := orbcore.OrbitToPosition(orb)
+		fmt.Fprintln(f, r)
 
 		//fmt.Fprintln(f, "%s,%v\n", orb.ID, mat.Formatted(r.T(), mat.Prefix(""), mat.Squeeze()))
 		counter.Incr(1)
