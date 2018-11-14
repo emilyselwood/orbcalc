@@ -30,13 +30,13 @@ func TestRotation(t *testing.T) {
 func TestQuickerRotationMatrixForOrbit(t *testing.T) {
 	angle := 45 * math.Pi / 180.0 // Not using the function in orbconvert because of an import loop
 
-	result1 := Rotate(mat.NewVecDense(3, []float64{1, 1, 1}), angle, AxisZ)
+	result1 := Rotate(mat.NewVecDense(3, []float64{10000, 10000, 10000}), angle, AxisZ)
 	result1 = Rotate(result1, angle, AxisX)
 	result1 = Rotate(result1, angle, AxisZ)
 
 	rot2 := QuickerRotationMatrixForOrbit(angle, angle, angle)
 
-	result2 := mat.NewVecDense(3, []float64{1, 1, 1})
+	result2 := mat.NewVecDense(3, []float64{10000, 10000, 10000})
 	result2.MulVec(rot2, result2)
 
 	if !mat.EqualApprox(result1, result2, 0.000000000000001) {
@@ -52,13 +52,13 @@ func TestTestQuickerRotationMatrixForOrbitLong(t *testing.T) {
 		t.Run(fmt.Sprintf("deg:%v", i), func(t2 *testing.T) {
 			angle := float64(i) * math.Pi / 180.0
 
-			result1 := Rotate(mat.NewVecDense(3, []float64{1, 1, 1}), angle, AxisZ)
+			result1 := Rotate(mat.NewVecDense(3, []float64{10000, 10000, 10000}), angle, AxisZ)
 			result1 = Rotate(result1, angle, AxisX)
 			result1 = Rotate(result1, angle, AxisZ)
 
 			rot2 := QuickerRotationMatrixForOrbit(angle, angle, angle)
 
-			result2 := mat.NewVecDense(3, []float64{1, 1, 1})
+			result2 := mat.NewVecDense(3, []float64{10000, 10000, 10000})
 			result2.MulVec(rot2, result2)
 
 			if !mat.EqualApprox(result1, result2, 0.000000000000001) {
@@ -68,6 +68,19 @@ func TestTestQuickerRotationMatrixForOrbitLong(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestRotationMatrixGeneration(t *testing.T) {
+	angle := 45 * math.Pi / 180.0 // Not using the function in orbconvert because of an import loop
+	m1 := RotationMatrix(angle, AxisX)
+	m2 := QuickerRotationMatrixForOrbit(0, angle, 0)
+
+	if !mat.EqualApprox(m1, m2, 0.000000000000001) {
+		t.Log("\nresult1:", mat.Formatted(m1, mat.Prefix("m1: "), mat.Squeeze()))
+		t.Log("\nresult2:", mat.Formatted(m2, mat.Prefix("m2: "), mat.Squeeze()))
+		t.Fail()
+	}
+
 }
 
 func BenchmarkQuickerRotationMatrix(b *testing.B) {
