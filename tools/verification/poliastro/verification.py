@@ -3,18 +3,9 @@ from astropy.time import Time
 
 from poliastro.bodies import *
 from poliastro.twobody import Orbit
-from poliastro.plotting import OrbitPlotter, plot
-from poliastro.twobody.classical import coe2rv
-from poliastro.core.elements import rv_pqw
 
 def process(name, orbit, path):
     f = open(name.replace(" ", "_") + ".csv","w+")
-    r, v = coe2rv(orbit.attractor.k.to(u.km ** 3 / u.s ** 2).value,
-                      orbit.p.to(u.km).value,
-                      orbit.ecc.value,
-                      orbit.nu.to(u.rad).value)
-    print(name, "r:", r)
-    print(name, "v:", v)
     for i in range(0, 366):
         if i == 0:
             e = orbit.epoch

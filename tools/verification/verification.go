@@ -77,9 +77,6 @@ func processOrbit(orb *orbcore.Orbit, outDir string) error {
 			updated = orbcore.MeanMotion(orbdata.SunGrav, orb, duration)
 		} else {
 			updated = orb
-			r, v := orbcore.OrbitToVector(updated)
-			fmt.Println(orb.ID, "r:", r)
-			fmt.Println(orb.ID, "v:", v)
 		}
 		p := orbcore.OrbitToPosition(updated)
 		fmt.Fprintln(f, p)
