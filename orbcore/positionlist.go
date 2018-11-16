@@ -125,7 +125,7 @@ func ParsePositionLine(line string) (*Position, error) {
 func parseTime(in string) (*time.Time, error) {
 	i, err := time.Parse(time.RFC3339, in)
 	if err != nil {
-		i, err = time.Parse("2006-01-02T15:04:05.999", in)
+		i, err = time.Parse("2006-01-02T15:04:05.999", in) // default python date format. (milli seconds and no tz)
 		if err != nil {
 			return nil, err
 		}

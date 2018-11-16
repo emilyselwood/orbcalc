@@ -118,3 +118,11 @@ func OrbitToVecPerifocal(orbit *Orbit) (*mat.VecDense, *mat.VecDense) {
 
 	return r, v
 }
+
+/*
+OrbitalPeriod returns the time taken for a complete orbit.
+*/
+func OrbitalPeriod(orbit *Orbit, parent float64) time.Duration {
+	t := 2 * math.Pi * math.Sqrt(math.Pow(orbit.SemimajorAxis, 3)/parent)
+	return time.Duration(t) * time.Second
+}

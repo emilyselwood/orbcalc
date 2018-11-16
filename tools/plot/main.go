@@ -2,10 +2,10 @@ package main
 
 import (
 	"flag"
-	"log"
-	"image/color"
-	"strings"
 	"fmt"
+	"image/color"
+	"log"
+	"strings"
 
 	"github.com/wselwood/orbcalc/orbcore"
 	"gonum.org/v1/plot"
@@ -40,7 +40,7 @@ func main() {
 
 	p.Title.Text = fmt.Sprintf("Orbit of %s between %v and %v", result[0].ID, result[0].Epoch, result[len(result)-1].Epoch)
 
-	p.X.Label.Text = "X (1e8km)"	
+	p.X.Label.Text = "X (1e8km)"
 	p.X.Tick.Marker = shortTicks{}
 	p.Y.Label.Text = "Y (1e8km)"
 	p.Y.Tick.Marker = shortTicks{}
@@ -53,7 +53,7 @@ func main() {
 	l.LineStyle.Width = vg.Points(1)
 	l.LineStyle.Color = color.RGBA{B: 255, A: 255}
 
-	p.Add(l)	
+	p.Add(l)
 
 	if err := p.Save(800, 800, *out); err != nil {
 		log.Fatal(err)
@@ -70,8 +70,8 @@ func rowsToPointsXY(rows []*orbcore.Position) plotter.XYs {
 }
 
 type shortTicks struct{}
-// Ticks computes the default tick marks, but inserts commas
-// into the labels for the major tick marks.
+
+// Makes the ticks shortened.
 func (shortTicks) Ticks(min, max float64) []plot.Tick {
 	tks := plot.DefaultTicks{}.Ticks(min, max)
 	for i, t := range tks {

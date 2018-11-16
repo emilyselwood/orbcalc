@@ -70,15 +70,8 @@ func processOrbit(orb *orbcore.Orbit, outDir string) error {
 
 	defer f.Close()
 
-	for i := 0; i <= 365; i++ { // loop for a year of days
-		duration := time.Duration(i) * (time.Hour * 24) // all in UTC so no DST changes or other weirdness that stops us having constant days.
-		var updated *orbcore.Orbit
-		if i > 0 {
-			updated = orbcore.MeanMotion(orbdata.SunGrav, orb, duration)
-		} else {
-			updated = orb
-		}
-		p := orbcore.OrbitToPosition(updated)
+	for _, r := range orbcore.MeanMotionStepped(orbdata.SunGrav, orb, time.Hour*24, 365) {
+		p := orbcore.OrbitToPosition(r)
 		fmt.Fprintln(f, p)
 	}
 

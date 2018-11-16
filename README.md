@@ -34,7 +34,7 @@ Fantastic. We welcome an help you can give. We especially welcome bug reports an
 please let us know. If you have found a pain point please let us know, we can probably make it easier to use. If you are not sure if something is a bug please
 rase it any way. Worst case it is something we need to document better.
 
-If you want to provide code support to the project we use the "usual" github process, issues, forks and pull requests. 
+If you want to provide code support to the project we use the "usual" github process, issues, forks and pull requests.
 
 ### Building from source
 

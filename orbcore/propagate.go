@@ -8,6 +8,30 @@ import (
 )
 
 /*
+MeanMotionStepped calculates a mean motion value for [count] [timeStep]s and returns a list of orbits.
+Note: The first entry in the returned list will always be the starting orbit object.
+*/
+func MeanMotionStepped(parent float64, orbit *Orbit, timeStep time.Duration, count int64) []*Orbit {
+	result := make([]*Orbit, count+1)
+	result[0] = orbit
+	var i int64
+	for i = 1; i <= count; i++ {
+		offset := timeStep * time.Duration(i)
+		result[i] = MeanMotion(parent, orbit, offset)
+	}
+	return result
+}
+
+/*
+MeanMotionFullOrbit will calculate a number of entries for a full orbit, divided into [count] steps
+*/
+func MeanMotionFullOrbit(parent float64, orbit *Orbit, count int64) []*Orbit {
+	orbitalPeriod := OrbitalPeriod(orbit, parent)
+	step := orbitalPeriod / time.Duration(count)
+	return MeanMotionStepped(parent, orbit, step, count)
+}
+
+/*
 MeanMotion uses the mean motion method to propgate [orbit] through [t] seconds around [parent].
 */
 func MeanMotion(parent float64, orbit *Orbit, t time.Duration) *Orbit {
