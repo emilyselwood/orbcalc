@@ -23,6 +23,17 @@ func MeanMotionStepped(parent float64, orbit *Orbit, timeStep time.Duration, cou
 }
 
 /*
+MeanMotionSteppedChannel works like MeanMotionStepped except it puts the results down a channel rather than returning a list
+*/
+func MeanMotionSteppedChannel(parent float64, orbit *Orbit, timeStep time.Duration, count int64, output chan *Orbit) {
+	var i int64
+	for i = 1; i <= count; i++ {
+		offset := timeStep * time.Duration(i)
+		output <- MeanMotion(parent, orbit, offset)
+	}
+}
+
+/*
 MeanMotionFullOrbit will calculate a number of entries for a full orbit, divided into [count] steps
 */
 func MeanMotionFullOrbit(parent float64, orbit *Orbit, count int64) []*Orbit {

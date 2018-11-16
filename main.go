@@ -72,7 +72,7 @@ func main() {
 
 	// Prepares channels to transfer data between stages of the processing.
 	stage1 := make(chan *orbcore.Orbit, channelSize)
-	stage2 := make(chan *orbcore.Orbit, channelSize)
+	stage2 := make(chan *orbcore.Position, channelSize)
 
 	// Wait groups for each stage so we know when things are done.
 	var readGroup sync.WaitGroup
@@ -138,19 +138,19 @@ func stageRead(inputfile string, target int, skip int, output chan *orbcore.Orbi
 
 }
 
-func stageMeanMotion(in chan *orbcore.Orbit, output chan *orbcore.Orbit, wg *sync.WaitGroup, counter *ratecounter.RateCounter) {
+func stageMeanMotion(in chan *orbcore.Orbit, output chan *orbcore.Position, wg *sync.WaitGroup, counter *ratecounter.RateCounter) {
 	defer wg.Done()
 	oneDay := 24 * time.Hour
 	for orb := range in {
-		r := orbcore.MeanMotionStepped(orbdata.SunGrav, orb, oneDay, 10)
+		r := orbcore.MeanMotionStepped(orbdata.SunGrav, orb, oneDay, 2000)
 		for _, o := range r {
-			output <- o
+			output <- orbcore.OrbitToPosition(o)
 		}
 		counter.Incr(1)
 	}
 }
 
-func stageOutput(outputPath string, in chan *orbcore.Orbit, wg *sync.WaitGroup, counter *ratecounter.RateCounter) {
+func stageOutput(outputPath string, in chan *orbcore.Position, wg *sync.WaitGroup, counter *ratecounter.RateCounter) {
 	defer wg.Done()
 
 	f, err := os.Create(outputPath)
@@ -162,8 +162,7 @@ func stageOutput(outputPath string, in chan *orbcore.Orbit, wg *sync.WaitGroup, 
 	w := bufio.NewWriterSize(f, 64*1024)
 	defer w.Flush()
 	for orb := range in {
-		r := orbcore.OrbitToPosition(orb)
-		w.WriteString(r.String())
+		w.WriteString(orb.String())
 		w.WriteRune('\n')
 		counter.Incr(1)
 	}
