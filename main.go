@@ -1,8 +1,8 @@
 package main
 
 import (
+	"bufio"
 	"flag"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -19,8 +19,8 @@ import (
 )
 
 const monitoringInterval = 1 * time.Second
-const processors = 1
-const channelSize = 10000
+const processors = 3
+const channelSize = 100000
 
 var inputfile = flag.String("in", "", "the minor planet center file to read")
 var outputfile = flag.String("out", "", "path to output file")
@@ -66,7 +66,7 @@ func main() {
 
 	go func() {
 		for range timer.C {
-			log.Printf("stage1: %v stage2: %v, stage3: %v", counter1.Rate(), counter2.Rate(), counter3.Rate())
+			log.Printf("stage1: %v stage2: %v stage3: %v", counter1.Rate(), counter2.Rate(), counter3.Rate())
 		}
 	}()
 
@@ -140,12 +140,14 @@ func stageRead(inputfile string, target int, skip int, output chan *orbcore.Orbi
 
 func stageMeanMotion(in chan *orbcore.Orbit, output chan *orbcore.Orbit, wg *sync.WaitGroup, counter *ratecounter.RateCounter) {
 	defer wg.Done()
-
+	oneDay := 24 * time.Hour
 	for orb := range in {
-		output <- orbcore.MeanMotion(orbdata.SunGrav, orb, time.Duration(24)*time.Hour)
+		r := orbcore.MeanMotionStepped(orbdata.SunGrav, orb, oneDay, 10)
+		for _, o := range r {
+			output <- o
+		}
 		counter.Incr(1)
 	}
-
 }
 
 func stageOutput(outputPath string, in chan *orbcore.Orbit, wg *sync.WaitGroup, counter *ratecounter.RateCounter) {
@@ -156,9 +158,13 @@ func stageOutput(outputPath string, in chan *orbcore.Orbit, wg *sync.WaitGroup, 
 		log.Fatal("error creating outputfile ", err)
 	}
 	defer f.Close()
+
+	w := bufio.NewWriterSize(f, 64*1024)
+	defer w.Flush()
 	for orb := range in {
 		r := orbcore.OrbitToPosition(orb)
-		fmt.Fprintln(f, r)
+		w.WriteString(r.String())
+		w.WriteRune('\n')
 		counter.Incr(1)
 	}
 
