@@ -30,10 +30,13 @@ var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 
 /*
 An example program that uses the gompcreader and calculates the position in space for each object.
+This example is a little more complex than strictly needed as it parallises the processing and keeps counters.
 */
 func main() {
 	flag.Parse()
 
+	// If a cpu project has been requested then set that up.
+	// This is not strictly needed but it does help us know what is going on with the program
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
 		if err != nil {
@@ -52,11 +55,12 @@ func main() {
 		log.Fatal("No output file prvided. Use the -out /path/to/outputfile")
 	}
 
-	// rate counters for each stage
+	// rate counters for each processing stage
 	counter1 := ratecounter.NewRateCounter(monitoringInterval)
 	counter2 := ratecounter.NewRateCounter(monitoringInterval)
 	counter3 := ratecounter.NewRateCounter(monitoringInterval)
 
+	// start an thing to print rate information as we are processing.
 	timer := time.NewTicker(monitoringInterval)
 	defer timer.Stop()
 
@@ -66,21 +70,26 @@ func main() {
 		}
 	}()
 
+	// Prepares channels to transfer data between stages of the processing.
 	stage1 := make(chan *orbcore.Orbit, channelSize)
 	stage2 := make(chan *orbcore.Orbit, channelSize)
 
+	// Wait groups for each stage so we know when things are done.
 	var readGroup sync.WaitGroup
 	var fanGroup sync.WaitGroup
 	var complete sync.WaitGroup
 
+	// Setup stage one which reads in the input file, parses the records from it and passes them on to the next stage.
 	readGroup.Add(1)
 	go stageRead(*inputfile, *count, *skip, stage1, &readGroup, counter1)
 
+	// Stage two progates an object forward one day and then passes it on.
 	for i := 0; i < processors; i++ {
 		fanGroup.Add(1)
 		go stageMeanMotion(stage1, stage2, &fanGroup, counter2)
 	}
 
+	// The final stage converts the orbit information into a position in space and then writes it to a file.
 	complete.Add(1)
 	go stageOutput(*outputfile, stage2, &complete, counter3)
 
@@ -94,9 +103,9 @@ func main() {
 
 	complete.Wait()
 	log.Println("done")
-
 }
 
+// stageRead opens a file using the gompcreader project and reads out orbital information.
 func stageRead(inputfile string, target int, skip int, output chan *orbcore.Orbit, wg *sync.WaitGroup, counter *ratecounter.RateCounter) {
 	mpcReader, err := gompcreader.NewMpcReader(inputfile)
 	if err != nil {
@@ -150,8 +159,6 @@ func stageOutput(outputPath string, in chan *orbcore.Orbit, wg *sync.WaitGroup, 
 	for orb := range in {
 		r := orbcore.OrbitToPosition(orb)
 		fmt.Fprintln(f, r)
-
-		//fmt.Fprintln(f, "%s,%v\n", orb.ID, mat.Formatted(r.T(), mat.Prefix(""), mat.Squeeze()))
 		counter.Incr(1)
 	}
 
