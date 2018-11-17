@@ -4,6 +4,7 @@ orbcalc
 tools/verification/verification
 tools/diff/diff
 tools/plot/plot
+tools/animatedplot/animatedplot
 output.txt
 out.txt
 *.csv
