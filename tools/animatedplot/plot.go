@@ -77,7 +77,7 @@ func main() {
 		}()
 	}
 
-	for i := int64(0); i < 2000; i++ {
+	for i := int64(0); i < 6000; i++ {
 		processFrame(i, saveChan)
 	}
 
@@ -212,7 +212,7 @@ func stagePlot(days int64, in chan *orbcore.Position, saveChan chan *savePack, o
 	
 	p.Add(scatter)
 
-	filename := filepath.Join(outputPath, fmt.Sprintf("frame_%d.png", days))
+	filename := filepath.Join(outputPath, fmt.Sprintf("frame_%05d.png", days))
 	saveChan <- &savePack{
 		filename:filename,
 		plot:p,
