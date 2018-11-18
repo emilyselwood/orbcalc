@@ -31,9 +31,8 @@ const processors = 3
 const channelSize = 100000
 
 var inputfile = flag.String("in", "", "the minor planet center file to read")
-var outputfile = flag.String("out", "", "path to output file")
-var count = flag.Int("count", 1000000, "number of records to run")
-var skip = flag.Int("skip", 0, "number of records from the begining to skip")
+var outputPath = flag.String("out", "", "path to output files")
+var count = flag.Int("count", 6000, "number of frames to run")
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 
 /*
@@ -59,11 +58,11 @@ func main() {
 		log.Fatal("No input file provided. Use the -in /path/to/file")
 	}
 
-	if *outputfile == "" {
-		log.Fatal("No output file prvided. Use the -out /path/to/outputfile")
+	if *outputPath == "" {
+		log.Fatal("No output file prvided. Use the -out /path/to/outputfiles")
 	}
 
-	os.MkdirAll(*outputfile, os.ModePerm)
+	os.MkdirAll(*outputPath, os.ModePerm)
 
 	saveChan := make(chan *savePack, 100)
 	var saveWait sync.WaitGroup
@@ -79,7 +78,7 @@ func main() {
 		}()
 	}
 
-	for i := int64(0); i < 6; i++ {
+	for i := int64(0); i < int64(*count); i++ {
 		processFrame(i, saveChan)
 	}
 
@@ -117,7 +116,7 @@ func processFrame(days int64, saveChan chan *savePack) {
 
 	// Setup stage one which reads in the input file, parses the records from it and passes them on to the next stage.
 	readGroup.Add(1)
-	go stageRead(*inputfile, *count, *skip, stage1, &readGroup, counter1)
+	go stageRead(*inputfile, 1000000, 0, stage1, &readGroup, counter1)
 
 	// Stage two progates an object forward one day and then passes it on.
 	for i := 0; i < processors; i++ {
@@ -130,7 +129,7 @@ func processFrame(days int64, saveChan chan *savePack) {
 
 	// The final stage converts the orbit information into a position in space and then writes it to a file.
 	complete.Add(1)
-	go stagePlot(days, stage3, saveChan, *outputfile, &complete, counter4)
+	go stagePlot(days, stage3, saveChan, *outputPath, &complete, counter4)
 
 	readGroup.Wait()
 
