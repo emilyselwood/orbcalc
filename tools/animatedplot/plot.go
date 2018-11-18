@@ -66,9 +66,11 @@ func main() {
 	os.MkdirAll(*outputfile, os.ModePerm)
 
 	saveChan := make(chan *savePack, 100)
-	defer close(saveChan)
+	var saveWait sync.WaitGroup
 	for i := 0; i < 4; i++ {
+		saveWait.Add(1)
 		go func() {
+			defer saveWait.Done()
 			for s := range saveChan {		
 				if err := s.plot.Save(1000, 1000, s.filename); err != nil {
 					panic(err)
@@ -77,10 +79,12 @@ func main() {
 		}()
 	}
 
-	for i := int64(0); i < 6000; i++ {
+	for i := int64(0); i < 6; i++ {
 		processFrame(i, saveChan)
 	}
 
+	close(saveChan)
+	saveWait.Wait()
 }
 
 func processFrame(days int64, saveChan chan *savePack) {
@@ -129,15 +133,12 @@ func processFrame(days int64, saveChan chan *savePack) {
 	go stagePlot(days, stage3, saveChan, *outputfile, &complete, counter4)
 
 	readGroup.Wait()
-	log.Println("done waiting for read")
 
 	meanMotionGroup.Wait()
 	close(stage2)
 
 	positionGroup.Wait()
 	close(stage3)
-
-	log.Println("done waiting for fan")
 
 	complete.Wait()
 	log.Println("done", days)
