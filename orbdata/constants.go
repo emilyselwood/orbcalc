@@ -5,6 +5,10 @@ In here you will find Gravitational constants of the major planets
 */
 package orbdata
 
+import (
+	"time"
+)
+
 /*
 SunGrav IAU2009 Heliocentric gravitational constant (km^3)/(s^-2)
 */
@@ -41,3 +45,8 @@ const NeptuneGrav = 6836527.100580397
 AU represents the length of an Astronomical Unit in KiloMeters
 */
 const AU = 149598000
+
+/*
+J2000 is the base time epoch of a lot of astronomical times.
+*/
+var J2000 = time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)

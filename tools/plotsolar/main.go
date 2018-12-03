@@ -34,10 +34,8 @@ func main() {
 
 	p.Title.Text = fmt.Sprintf("Orbit of %s between %v and %v", result[0].ID, result[0].Epoch, result[len(result)-1].Epoch)
 
-	p.X.Label.Text = "X (1e8km)"
-	p.X.Tick.Marker = shortTicks{}
-	p.Y.Label.Text = "Y (1e8km)"
-	p.Y.Tick.Marker = shortTicks{}
+	p.X.Label.Text = "X"
+	p.Y.Label.Text = "Y"
 
 	l, err := plotter.NewLine(rowsToPointsXY(result))
 	if err != nil {
