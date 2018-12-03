@@ -144,7 +144,7 @@ func stageMeanMotion(in chan *orbcore.Orbit, output chan *orbcore.Position, wg *
 	for orb := range in {
 		r := orbcore.MeanMotionStepped(orbdata.SunGrav, orb, oneDay, 2000)
 		for _, o := range r {
-			output <- orbcore.OrbitToPosition(o)
+			output <- orbcore.OrbitToPosition(o,orbdata.SunGrav)
 		}
 		counter.Incr(1)
 	}

@@ -71,7 +71,7 @@ func processOrbit(orb *orbcore.Orbit, outDir string) error {
 	defer f.Close()
 
 	for _, r := range orbcore.MeanMotionStepped(orbdata.SunGrav, orb, time.Hour*24, 365) {
-		p := orbcore.OrbitToPosition(r)
+		p := orbcore.OrbitToPosition(r, orbdata.SunGrav)
 		fmt.Fprintln(f, p)
 	}
 

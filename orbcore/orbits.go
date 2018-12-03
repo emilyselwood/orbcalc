@@ -8,7 +8,6 @@ import (
 	"math"
 	"time"
 
-	"github.com/wselwood/orbcalc/orbdata"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -73,9 +72,9 @@ func VectorToHelocentric(r mat.Vector, v mat.Vector) (mat.Vector, mat.Vector) {
 /*
 OrbitToVector creates a vector representation from a MinorPlanet object
 */
-func OrbitToVector(orbit *Orbit) (mat.Vector, mat.Vector) {
+func OrbitToVector(orbit *Orbit, grav float64) (mat.Vector, mat.Vector) {
 
-	r, v := OrbitToVecPerifocal(orbit)
+	r, v := OrbitToVecPerifocal(orbit, grav)
 
 	/*
 		TODO: Fix this and put it back in some day.
@@ -100,7 +99,7 @@ func OrbitToVector(orbit *Orbit) (mat.Vector, mat.Vector) {
 /*
 OrbitToVecPerifocal converts a MinorPlanet object into r and v vectors in the perifocal frame
 */
-func OrbitToVecPerifocal(orbit *Orbit) (*mat.VecDense, *mat.VecDense) {
+func OrbitToVecPerifocal(orbit *Orbit, grav float64) (*mat.VecDense, *mat.VecDense) {
 
 	a := orbit.SemimajorAxis * (1 - math.Pow(orbit.OrbitalEccentricity, 2))
 	cosNu := math.Cos(orbit.MeanAnomalyEpoch)
@@ -113,7 +112,7 @@ func OrbitToVecPerifocal(orbit *Orbit) (*mat.VecDense, *mat.VecDense) {
 
 	v := mat.NewVecDense(3, []float64{-sinNu, orbit.OrbitalEccentricity + cosNu, 0})
 
-	vMult := math.Sqrt(orbdata.SunGrav / a)
+	vMult := math.Sqrt(grav / a)
 	v.ScaleVec(vMult, v)
 
 	return r, v

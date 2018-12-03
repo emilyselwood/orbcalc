@@ -188,7 +188,7 @@ func stageMeanMotion(days int64, in chan *orbcore.Orbit, output chan *orbcore.Or
 func stagePosition(in chan *orbcore.Orbit, out chan *orbcore.Position, wg *sync.WaitGroup, counter *ratecounter.RateCounter) {
 	defer wg.Done()
 	for orb := range in {
-		out <- orbcore.OrbitToPosition(orb)
+		out <- orbcore.OrbitToPosition(orb, orbdata.SunGrav)
 		counter.Incr(1)
 	}
 }
