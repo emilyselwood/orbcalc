@@ -16,6 +16,7 @@ import (
 	"github.com/wselwood/orbcalc/orbconvert"
 	"github.com/wselwood/orbcalc/orbcore"
 	"github.com/wselwood/orbcalc/orbdata"
+	"github.com/wselwood/orbcalc/orbplot"
 
 	"github.com/paulbellamy/ratecounter"
 
@@ -154,8 +155,8 @@ func stageRead(inputfile string, target int, skip int, output chan *orbcore.Orbi
 	var count int
 	result, err := mpcReader.ReadEntry()
 	for err == nil {
-		orb := orbconvert.ConvertFromMinorPlanet(result)
 		if skip == 0 {
+			orb := orbconvert.ConvertFromMinorPlanet(result)
 			//fmt.Println(orb)
 			output <- orb
 		} else {
@@ -209,12 +210,28 @@ func stagePlot(days int64, in chan *orbcore.Position, saveChan chan *savePack, o
 
 	p.Add(scatter)
 
+	if err := orbplot.PlotFullOrbitLines(p, majorBodies, true); err != nil {
+		panic(err)
+	}
+	if err := orbplot.PlotSun(p); err != nil {
+		panic(err)
+	}
+
 	filename := filepath.Join(outputPath, fmt.Sprintf("frame_%05d.png", days))
 	saveChan <- &savePack{
 		filename: filename,
 		plot:     p,
 	}
 
+}
+
+var majorBodies = []orbcore.Orbit{
+	orbdata.EarthOrbit,
+	orbdata.MarsOrbit,
+	orbdata.JupiterOrbit,
+	orbdata.SaturnOrbit,
+	orbdata.UranusOrbit,
+	orbdata.NeptuneOrbit,
 }
 
 func createPlot(t int64) *plot.Plot {

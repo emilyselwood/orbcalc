@@ -3,9 +3,9 @@
 orbcalc
 tools/verification/verification
 tools/diff/diff
-tools/plot/plot
-tools/plotsolar/plotsolar
 tools/animatedplot/animatedplot
+examples/plot/plot
+examples/plotsolar/plotsolar
 output.txt
 out.txt
 *.csv
