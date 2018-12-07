@@ -9,6 +9,7 @@ import (
 // MercuryOrbit defines the standard mercury orbit
 var MercuryOrbit = orbcore.Orbit{
 	ID:                          "Mercury",
+	ParentGrav:                  SunGrav,
 	Epoch:                       J2000,
 	MeanAnomalyEpoch:            0.7363828677023899,  // rad
 	ArgumentOfPerihelion:        1.290398137330985,   // rad
@@ -21,6 +22,7 @@ var MercuryOrbit = orbcore.Orbit{
 // VenusOrbit defines the standard mercury orbit
 var VenusOrbit = orbcore.Orbit{
 	ID:                          "Venus",
+	ParentGrav:                  SunGrav,
 	Epoch:                       J2000,
 	MeanAnomalyEpoch:            6.024347789858294,   // rad
 	ArgumentOfPerihelion:        1.8790979389622697,  // rad
@@ -33,6 +35,7 @@ var VenusOrbit = orbcore.Orbit{
 // EarthOrbit defines the standard earth orbit.
 var EarthOrbit = orbcore.Orbit{
 	ID:                          "Earth",
+	ParentGrav:                  SunGrav,
 	Epoch:                       J2000,
 	MeanAnomalyEpoch:            6.039693392708146,     // rad
 	ArgumentOfPerihelion:        1.4877567222443007,    // rad
@@ -45,6 +48,7 @@ var EarthOrbit = orbcore.Orbit{
 // MarsOrbit defines the standard mars orbit.
 var MarsOrbit = orbcore.Orbit{
 	ID:                          "Mars",
+	ParentGrav:                  SunGrav,
 	Epoch:                       J2000,
 	MeanAnomalyEpoch:            0.9016227920497925,   // rad
 	ArgumentOfPerihelion:        5.804221558977953,    // rad
@@ -57,6 +61,7 @@ var MarsOrbit = orbcore.Orbit{
 // JupiterOrbit defines the standard Jupiter orbit.
 var JupiterOrbit = orbcore.Orbit{
 	ID:                          "Jupiter",
+	ParentGrav:                  SunGrav,
 	Epoch:                       J2000,
 	MeanAnomalyEpoch:            3.986624571747394,    // rad
 	ArgumentOfPerihelion:        0.22894709895829354,  // rad
@@ -69,6 +74,7 @@ var JupiterOrbit = orbcore.Orbit{
 // SaturnOrbit defines the standard Saturn orbit.
 var SaturnOrbit = orbcore.Orbit{
 	ID:                          "Saturn",
+	ParentGrav:                  SunGrav,
 	Epoch:                       J2000,
 	MeanAnomalyEpoch:            3.2720797523951766,  // rad
 	ArgumentOfPerihelion:        1.5276434137035415,  // rad
@@ -81,6 +87,7 @@ var SaturnOrbit = orbcore.Orbit{
 // UranusOrbit defines the standard Uranus orbit.
 var UranusOrbit = orbcore.Orbit{
 	ID:                          "Uranus",
+	ParentGrav:                  SunGrav,
 	Epoch:                       J2000,
 	MeanAnomalyEpoch:            3.8644829632802806,  // rad
 	ArgumentOfPerihelion:        2.926548412800625,   // rad
@@ -93,6 +100,7 @@ var UranusOrbit = orbcore.Orbit{
 // NeptuneOrbit defines the standard Neptune orbit.
 var NeptuneOrbit = orbcore.Orbit{
 	ID:                          "Neptune",
+	ParentGrav:                  SunGrav,
 	Epoch:                       J2000,
 	MeanAnomalyEpoch:            5.100969108525634,    // rad
 	ArgumentOfPerihelion:        0.8712884041923264,   // rad

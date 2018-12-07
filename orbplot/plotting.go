@@ -49,7 +49,7 @@ func PlotFullOrbitLines(p *plot.Plot, orbits []orbcore.Orbit, legend bool) error
 // PlotFullOrbitLine takes a plot and orbit and draws a line for its full orbit in the provided color
 func PlotFullOrbitLine(p *plot.Plot, orb orbcore.Orbit, c color.RGBA, legend bool) error {
 
-	result := propogate(&orb, orbdata.SunGrav)
+	result := propogate(&orb)
 
 	l, err := plotter.NewLine(PositionToPointsXY(result))
 	if err != nil {
@@ -63,6 +63,25 @@ func PlotFullOrbitLine(p *plot.Plot, orb orbcore.Orbit, c color.RGBA, legend boo
 	if legend {
 		p.Legend.Add(orb.ID, l)
 	}
+	return nil
+}
+
+// PlotPoints renders a point for each orbit object paired with the color list
+func PlotPoints(p *plot.Plot, orb []*orbcore.Orbit, c []color.RGBA, legend bool) error {
+	result := make([]*orbcore.Position, len(orb))
+	for i, d := range orb {
+		result[i] = orbcore.OrbitToPosition(d)
+	}
+	
+	scatter, err := plotter.NewScatter(PositionToPointsXY(result))
+	if err != nil {
+		return err
+	}
+
+	
+
+	p.Add(scatter)
+
 	return nil
 }
 
@@ -101,11 +120,11 @@ func PlotSun(p *plot.Plot) error {
 	return nil
 }
 
-func propogate(orb *orbcore.Orbit, parent float64) []*orbcore.Position {
-	steps := orbcore.MeanMotionFullOrbit(parent, orb, 366)
+func propogate(orb *orbcore.Orbit) []*orbcore.Position {
+	steps := orbcore.MeanMotionFullOrbit(orb, 366)
 	result := make([]*orbcore.Position, len(steps))
 	for i, d := range steps {
-		result[i] = orbcore.OrbitToPosition(d, parent)
+		result[i] = orbcore.OrbitToPosition(d)
 	}
 	return result
 }

@@ -16,8 +16,6 @@ func ConvertFromMinorPlanet(mpc *gompcreader.MinorPlanet) *orbcore.Orbit {
 
 	// TODO: convert more types as needed
 	result.ID = mpc.ID
-	result.AbsoluteMagnitude = mpc.AbsoluteMagnitude
-	result.Slope = mpc.Slope
 	result.Epoch = mpc.Epoch
 	result.MeanAnomalyEpoch = DegToRad(mpc.MeanAnomalyEpoch)
 	result.ArgumentOfPerihelion = DegToRad(mpc.ArgumentOfPerihelion)

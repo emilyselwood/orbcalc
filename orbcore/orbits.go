@@ -16,8 +16,7 @@ Orbit holds required information for orbit calculations
 */
 type Orbit struct {
 	ID                          string
-	AbsoluteMagnitude           float64
-	Slope                       float64
+	ParentGrav                  float64
 	Epoch                       time.Time
 	MeanAnomalyEpoch            float64 // nu
 	ArgumentOfPerihelion        float64 // w argp
@@ -34,8 +33,7 @@ Clone makes a copy of this orbit object
 func (o *Orbit) Clone() *Orbit {
 	return &Orbit{
 		ID:                          o.ID,
-		AbsoluteMagnitude:           o.AbsoluteMagnitude,
-		Slope:                       o.Slope,
+		ParentGrav:                  o.ParentGrav,
 		Epoch:                       o.Epoch,
 		MeanAnomalyEpoch:            o.MeanAnomalyEpoch,
 		ArgumentOfPerihelion:        o.ArgumentOfPerihelion,
@@ -48,8 +46,9 @@ func (o *Orbit) Clone() *Orbit {
 }
 
 func (o *Orbit) String() string {
-	return fmt.Sprintf("id: \"%v\" nu: %v w: %v omega: %v i: %v e: %v a: %v",
+	return fmt.Sprintf("id: \"%v\" pg: %v nu: %v w: %v omega: %v i: %v e: %v a: %v",
 		o.ID,
+		o.ParentGrav,
 		o.MeanAnomalyEpoch,
 		o.ArgumentOfPerihelion,
 		o.LongitudeOfTheAscendingNode,
@@ -72,9 +71,9 @@ func VectorToHelocentric(r mat.Vector, v mat.Vector) (mat.Vector, mat.Vector) {
 /*
 OrbitToVector creates a vector representation from a MinorPlanet object
 */
-func OrbitToVector(orbit *Orbit, grav float64) (mat.Vector, mat.Vector) {
+func OrbitToVector(orbit *Orbit) (mat.Vector, mat.Vector) {
 
-	r, v := OrbitToVecPerifocal(orbit, grav)
+	r, v := OrbitToVecPerifocal(orbit)
 
 	/*
 		TODO: Fix this and put it back in some day.
@@ -99,7 +98,7 @@ func OrbitToVector(orbit *Orbit, grav float64) (mat.Vector, mat.Vector) {
 /*
 OrbitToVecPerifocal converts a MinorPlanet object into r and v vectors in the perifocal frame
 */
-func OrbitToVecPerifocal(orbit *Orbit, grav float64) (*mat.VecDense, *mat.VecDense) {
+func OrbitToVecPerifocal(orbit *Orbit) (*mat.VecDense, *mat.VecDense) {
 
 	a := orbit.SemimajorAxis * (1 - math.Pow(orbit.OrbitalEccentricity, 2))
 	cosNu := math.Cos(orbit.MeanAnomalyEpoch)
@@ -112,7 +111,7 @@ func OrbitToVecPerifocal(orbit *Orbit, grav float64) (*mat.VecDense, *mat.VecDen
 
 	v := mat.NewVecDense(3, []float64{-sinNu, orbit.OrbitalEccentricity + cosNu, 0})
 
-	vMult := math.Sqrt(grav / a)
+	vMult := math.Sqrt(orbit.ParentGrav / a)
 	v.ScaleVec(vMult, v)
 
 	return r, v
@@ -121,7 +120,7 @@ func OrbitToVecPerifocal(orbit *Orbit, grav float64) (*mat.VecDense, *mat.VecDen
 /*
 OrbitalPeriod returns the time taken for a complete orbit.
 */
-func OrbitalPeriod(orbit *Orbit, parent float64) time.Duration {
-	t := 2 * math.Pi * math.Sqrt(math.Pow(orbit.SemimajorAxis, 3)/parent)
+func OrbitalPeriod(orbit *Orbit) time.Duration {
+	t := 2 * math.Pi * math.Sqrt(math.Pow(orbit.SemimajorAxis, 3)/orbit.ParentGrav)
 	return time.Duration(t) * time.Second
 }

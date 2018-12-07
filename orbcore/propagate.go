@@ -11,13 +11,13 @@ import (
 MeanMotionStepped calculates a mean motion value for [count] [timeStep]s and returns a list of orbits.
 Note: The first entry in the returned list will always be the starting orbit object.
 */
-func MeanMotionStepped(parent float64, orbit *Orbit, timeStep time.Duration, count int64) []*Orbit {
+func MeanMotionStepped(orbit *Orbit, timeStep time.Duration, count int64) []*Orbit {
 	result := make([]*Orbit, count+1)
 	result[0] = orbit
 	var i int64
 	for i = 1; i <= count; i++ {
 		offset := timeStep * time.Duration(i)
-		result[i] = MeanMotion(parent, orbit, offset)
+		result[i] = MeanMotion(orbit, offset)
 	}
 	return result
 }
@@ -25,37 +25,37 @@ func MeanMotionStepped(parent float64, orbit *Orbit, timeStep time.Duration, cou
 /*
 MeanMotionSteppedChannel works like MeanMotionStepped except it puts the results down a channel rather than returning a list
 */
-func MeanMotionSteppedChannel(parent float64, orbit *Orbit, timeStep time.Duration, count int64, output chan *Orbit) {
+func MeanMotionSteppedChannel(orbit *Orbit, timeStep time.Duration, count int64, output chan *Orbit) {
 	var i int64
 	for i = 1; i <= count; i++ {
 		offset := timeStep * time.Duration(i)
-		output <- MeanMotion(parent, orbit, offset)
+		output <- MeanMotion(orbit, offset)
 	}
 }
 
 /*
 MeanMotionFullOrbit will calculate a number of entries for a full orbit, divided into [count] steps
 */
-func MeanMotionFullOrbit(parent float64, orbit *Orbit, count int64) []*Orbit {
-	orbitalPeriod := OrbitalPeriod(orbit, parent)
+func MeanMotionFullOrbit(orbit *Orbit, count int64) []*Orbit {
+	orbitalPeriod := OrbitalPeriod(orbit)
 	step := orbitalPeriod / time.Duration(count)
-	return MeanMotionStepped(parent, orbit, step, count)
+	return MeanMotionStepped(orbit, step, count)
 }
 
 /*
-MeanMotion uses the mean motion method to propgate [orbit] through [t] seconds around [parent].
+MeanMotion uses the mean motion method to propgate [orbit] through [t] seconds .
 */
-func MeanMotion(parent float64, orbit *Orbit, t time.Duration) *Orbit {
+func MeanMotion(orbit *Orbit, t time.Duration) *Orbit {
 	p := orbit.SemimajorAxis * (1 - math.Pow(orbit.OrbitalEccentricity, 2))
 	m0 := createM0(orbit)
 	var newMeanAnomalyEpoch float64
 	if math.Abs(orbit.OrbitalEccentricity-1) > delta {
 		a := p / (1 - math.Pow(orbit.OrbitalEccentricity, 2))
-		m := m0 + float64(t.Seconds())*math.Sqrt(parent/math.Abs(math.Pow(a, 3)))
+		m := m0 + float64(t.Seconds())*math.Sqrt(orbit.ParentGrav/math.Abs(math.Pow(a, 3)))
 		newMeanAnomalyEpoch = mtoMeanAnomaly(m, orbit)
 	} else {
 		q := p * math.Abs(1.0-orbit.OrbitalEccentricity) / math.Abs(1.0-math.Pow(orbit.OrbitalEccentricity, 2))
-		m := m0 + float64(t.Seconds())*math.Sqrt(parent/2.0/math.Pow(q, 3))
+		m := m0 + float64(t.Seconds())*math.Sqrt(orbit.ParentGrav/2.0/math.Pow(q, 3))
 		newMeanAnomalyEpoch = mtoMeanAnomaly(m, orbit)
 	}
 

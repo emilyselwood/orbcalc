@@ -28,8 +28,8 @@ func (p *Position) String() string {
 /*
 OrbitToPosition converts an object object to its position on day 0
 */
-func OrbitToPosition(orb *Orbit, grav float64) *Position {
-	r, _ := OrbitToVector(orb, grav)
+func OrbitToPosition(orb *Orbit) *Position {
+	r, _ := OrbitToVector(orb)
 	return &Position{
 		ID:    orb.ID,
 		Epoch: orb.Epoch,

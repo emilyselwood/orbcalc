@@ -28,7 +28,7 @@ func main() {
 	p.X.Label.Text = "X (km)"
 	p.Y.Label.Text = "Y (km)"
 
-	if err := orbplot.PlotSolarSystemLines(p); err != nil {
+	if err := orbplot.PlotSolarSystemLines(p, true); err != nil {
 		log.Fatal(err)
 	}
 
