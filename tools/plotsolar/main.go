@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"image/color"
 	"log"
+	"math"
 	"strings"
-	"time"
 
 	"github.com/wselwood/orbcalc/orbcore"
 	"github.com/wselwood/orbcalc/orbdata"
@@ -24,18 +24,28 @@ func main() {
 		log.Fatal("Need an output filename")
 	}
 
-	result := propogate(&orbdata.EarthOrbit, orbdata.SunGrav)
-
 	// now to plot
 	p, err := plot.New()
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	p.Title.Text = fmt.Sprintf("Orbit of %s between %v and %v", result[0].ID, result[0].Epoch, result[len(result)-1].Epoch)
+	p.Title.Text = fmt.Sprintf("Solar system")
 
 	p.X.Label.Text = "X"
 	p.Y.Label.Text = "Y"
+
+	for i, orb := range orbdata.SolarSystem {
+		process(p, orb, rainbow(len(orbdata.SolarSystem), i))
+	}
+
+	if err := p.Save(800, 800, *out); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func process(p *plot.Plot, orb orbcore.Orbit, c color.RGBA) {
+
+	result := propogate(&orb, orbdata.SunGrav)
 
 	l, err := plotter.NewLine(rowsToPointsXY(result))
 	if err != nil {
@@ -43,13 +53,10 @@ func main() {
 	}
 
 	l.LineStyle.Width = vg.Points(1)
-	l.LineStyle.Color = color.RGBA{B: 255, A: 255}
+	l.LineStyle.Color = c
 
 	p.Add(l)
 
-	if err := p.Save(800, 800, *out); err != nil {
-		log.Fatal(err)
-	}
 }
 
 func rowsToPointsXY(rows []*orbcore.Position) plotter.XYs {
@@ -62,7 +69,7 @@ func rowsToPointsXY(rows []*orbcore.Position) plotter.XYs {
 }
 
 func propogate(orb *orbcore.Orbit, parent float64) []*orbcore.Position {
-	steps := orbcore.MeanMotionStepped(parent, orb, 24*time.Hour, 366)
+	steps := orbcore.MeanMotionFullOrbit(parent, orb, 366)
 	result := make([]*orbcore.Position, len(steps))
 	for i, d := range steps {
 		result[i] = orbcore.OrbitToPosition(d, parent)
@@ -84,4 +91,50 @@ func (shortTicks) Ticks(min, max float64) []plot.Tick {
 		}
 	}
 	return tks
+}
+
+func rainbow(numOfSteps, step int) color.RGBA {
+
+	var r, g, b float64
+
+	h := float64(step) / float64(numOfSteps)
+	i := math.Floor(h * 6)
+	f := h*6 - i
+	q := 1 - f
+
+	os := math.Remainder(i, 6)
+
+	switch os {
+	case 0:
+		r = 255
+		g = f * 255
+		b = 0
+	case 1:
+		r = q * 255
+		g = 255
+		b = 0
+	case 2:
+		r = 0
+		g = 255
+		b = f * 255
+	case 3:
+		r = 0
+		g = q * 255
+		b = 255
+	case 4:
+		r = f * 255
+		g = 0
+		b = 255
+	case 5:
+		r = 255
+		g = 0
+		b = q * 255
+	}
+
+	return color.RGBA{
+		R: uint8(r),
+		G: uint8(g),
+		B: uint8(b),
+		A: 255,
+	}
 }

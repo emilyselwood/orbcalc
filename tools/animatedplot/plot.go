@@ -1,17 +1,16 @@
 package main
 
 import (
-	
 	"flag"
+	"fmt"
 	"io"
 	"log"
-	"fmt"
 	"os"
+	"path/filepath"
 	"runtime/pprof"
+	"strconv"
 	"sync"
 	"time"
-	"strconv"
-	"path/filepath"
 
 	"github.com/wselwood/gompcreader"
 	"github.com/wselwood/orbcalc/orbconvert"
@@ -23,7 +22,6 @@ import (
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
-	
 )
 
 const monitoringInterval = 1 * time.Second
@@ -70,7 +68,7 @@ func main() {
 		saveWait.Add(1)
 		go func() {
 			defer saveWait.Done()
-			for s := range saveChan {		
+			for s := range saveChan {
 				if err := s.plot.Save(1000, 1000, s.filename); err != nil {
 					panic(err)
 				}
@@ -178,9 +176,9 @@ func stageRead(inputfile string, target int, skip int, output chan *orbcore.Orbi
 
 func stageMeanMotion(days int64, in chan *orbcore.Orbit, output chan *orbcore.Orbit, wg *sync.WaitGroup, counter *ratecounter.RateCounter) {
 	defer wg.Done()
-	offset := 24 * time.Hour *time.Duration(days)
+	offset := 24 * time.Hour * time.Duration(days)
 	for orb := range in {
-		output <- orbcore.MeanMotion(orbdata.SunGrav, orb, offset) 
+		output <- orbcore.MeanMotion(orbdata.SunGrav, orb, offset)
 		counter.Incr(1)
 	}
 }
@@ -196,10 +194,9 @@ func stagePosition(in chan *orbcore.Orbit, out chan *orbcore.Position, wg *sync.
 func stagePlot(days int64, in chan *orbcore.Position, saveChan chan *savePack, outputPath string, wg *sync.WaitGroup, counter *ratecounter.RateCounter) {
 	defer wg.Done()
 
-	
 	var data plotter.XYs
 	for orb := range in {
-		data = append(data, struct{X, Y float64}{orb.X, orb.Y})
+		data = append(data, struct{ X, Y float64 }{orb.X, orb.Y})
 		counter.Incr(1)
 	}
 
@@ -209,19 +206,19 @@ func stagePlot(days int64, in chan *orbcore.Position, saveChan chan *savePack, o
 		panic(err)
 	}
 	scatter.Radius = vg.Points(1)
-	
+
 	p.Add(scatter)
 
 	filename := filepath.Join(outputPath, fmt.Sprintf("frame_%05d.png", days))
 	saveChan <- &savePack{
-		filename:filename,
-		plot:p,
+		filename: filename,
+		plot:     p,
 	}
-	
+
 }
 
 func createPlot(t int64) *plot.Plot {
-	
+
 	p, err := plot.New()
 	if err != nil {
 		log.Fatal(err)
@@ -236,5 +233,5 @@ func createPlot(t int64) *plot.Plot {
 
 type savePack struct {
 	filename string
-	plot *plot.Plot
+	plot     *plot.Plot
 }
