@@ -1,6 +1,7 @@
 package main
 
 import (
+	"gonum.org/v1/plot/vg/draw"
 	"flag"
 	"fmt"
 	"io"
@@ -32,6 +33,7 @@ const channelSize = 100000
 var inputfile = flag.String("in", "", "the minor planet center file to read")
 var outputPath = flag.String("out", "", "path to output files")
 var count = flag.Int("count", 6000, "number of frames to run")
+var maxSemiMajorAxis = flag.Float64("max", 15, "maximum semimajor axis to accept, in AU")
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 
 /*
@@ -70,7 +72,7 @@ func main() {
 		go func() {
 			defer saveWait.Done()
 			for s := range saveChan {
-				if err := s.plot.Save(1000, 1000, s.filename); err != nil {
+				if err := s.plot.Save(7400, 7400, s.filename); err != nil {
 					panic(err)
 				}
 			}
@@ -156,9 +158,13 @@ func stageRead(inputfile string, target int, skip int, output chan *orbcore.Orbi
 	result, err := mpcReader.ReadEntry()
 	for err == nil {
 		if skip == 0 {
-			orb := orbconvert.ConvertFromMinorPlanet(result)
-			//fmt.Println(orb)
-			output <- orb
+			a := result.SemimajorAxis * (1 + result.OrbitalEccentricity)
+
+			if a < *maxSemiMajorAxis {
+				orb := orbconvert.ConvertFromMinorPlanet(result)
+				//fmt.Println(orb)
+				output <- orb
+			}
 		} else {
 			skip--
 		}
@@ -179,7 +185,7 @@ func stageMeanMotion(days int64, in chan *orbcore.Orbit, output chan *orbcore.Or
 	defer wg.Done()
 	offset := 24 * time.Hour * time.Duration(days)
 	for orb := range in {
-		output <- orbcore.MeanMotion(orbdata.SunGrav, orb, offset)
+		output <- orbcore.MeanMotion(orb, offset)
 		counter.Incr(1)
 	}
 }
@@ -187,7 +193,7 @@ func stageMeanMotion(days int64, in chan *orbcore.Orbit, output chan *orbcore.Or
 func stagePosition(in chan *orbcore.Orbit, out chan *orbcore.Position, wg *sync.WaitGroup, counter *ratecounter.RateCounter) {
 	defer wg.Done()
 	for orb := range in {
-		out <- orbcore.OrbitToPosition(orb, orbdata.SunGrav)
+		out <- orbcore.OrbitToPosition(orb)
 		counter.Incr(1)
 	}
 }
@@ -207,10 +213,11 @@ func stagePlot(days int64, in chan *orbcore.Position, saveChan chan *savePack, o
 		panic(err)
 	}
 	scatter.Radius = vg.Points(1)
+	scatter.Shape = draw.CircleGlyph{}
 
 	p.Add(scatter)
 
-	if err := orbplot.PlotFullOrbitLines(p, majorBodies, true); err != nil {
+	if err := orbplot.PlotFullOrbitLines(p, majorBodies, orbplot.RainbowList(len(majorBodies)), true); err != nil {
 		panic(err)
 	}
 	if err := orbplot.PlotSun(p); err != nil {
@@ -226,12 +233,14 @@ func stagePlot(days int64, in chan *orbcore.Position, saveChan chan *savePack, o
 }
 
 var majorBodies = []orbcore.Orbit{
+	orbdata.MercuryOrbit,
+	orbdata.VenusOrbit,
 	orbdata.EarthOrbit,
 	orbdata.MarsOrbit,
 	orbdata.JupiterOrbit,
-	orbdata.SaturnOrbit,
-	orbdata.UranusOrbit,
-	orbdata.NeptuneOrbit,
+	//orbdata.SaturnOrbit,
+	//orbdata.UranusOrbit,
+	//orbdata.NeptuneOrbit,
 }
 
 func createPlot(t int64) *plot.Plot {

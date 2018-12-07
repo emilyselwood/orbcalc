@@ -14,7 +14,7 @@ import (
 
 // PlotSolarSystemLines plots the major planets of the solar system on the provided plot
 func PlotSolarSystemLines(p *plot.Plot, legend bool) error {
-	if err := PlotFullOrbitLines(p, orbdata.SolarSystem, legend); err != nil {
+	if err := PlotFullOrbitLines(p, orbdata.SolarSystem, RainbowList(len(orbdata.SolarSystem)), legend); err != nil {
 		return err
 	}
 	return PlotSun(p)
@@ -22,7 +22,7 @@ func PlotSolarSystemLines(p *plot.Plot, legend bool) error {
 
 // PlotInnerSolarSystemLines plots the major planets of the inner solar system on the provided plot
 func PlotInnerSolarSystemLines(p *plot.Plot, legend bool) error {
-	if err := PlotFullOrbitLines(p, orbdata.InnerSolarSystem, legend); err != nil {
+	if err := PlotFullOrbitLines(p, orbdata.InnerSolarSystem, RainbowList(len(orbdata.InnerSolarSystem)), legend); err != nil {
 		return err
 	}
 	return PlotSun(p)
@@ -30,16 +30,16 @@ func PlotInnerSolarSystemLines(p *plot.Plot, legend bool) error {
 
 // PlotOuterSolarSystemLines plots the major planets of the outer solar system on the provided plot
 func PlotOuterSolarSystemLines(p *plot.Plot, legend bool) error {
-	if err := PlotFullOrbitLines(p, orbdata.OuterSolarSystem, legend); err != nil {
+	if err := PlotFullOrbitLines(p, orbdata.OuterSolarSystem, RainbowList(len(orbdata.OuterSolarSystem)), legend); err != nil {
 		return err
 	}
 	return PlotSun(p)
 }
 
 // PlotFullOrbitLines plots the full orbits of the provided orbits on the plot
-func PlotFullOrbitLines(p *plot.Plot, orbits []orbcore.Orbit, legend bool) error {
+func PlotFullOrbitLines(p *plot.Plot, orbits []orbcore.Orbit, colors []color.RGBA, legend bool) error {
 	for i, orb := range orbits {
-		if err := PlotFullOrbitLine(p, orb, Rainbow(len(orbits), i), legend); err != nil {
+		if err := PlotFullOrbitLine(p, orb, colors[i], legend); err != nil {
 			return err
 		}
 	}
@@ -78,7 +78,12 @@ func PlotPoints(p *plot.Plot, orb []*orbcore.Orbit, c []color.RGBA, legend bool)
 		return err
 	}
 
-	
+	scatter.GlyphStyleFunc = func(i int) draw.GlyphStyle {
+		var result draw.GlyphStyle
+
+		result.Color = c[i]
+		return result
+	}                                          
 
 	p.Add(scatter)
 
@@ -125,6 +130,15 @@ func propogate(orb *orbcore.Orbit) []*orbcore.Position {
 	result := make([]*orbcore.Position, len(steps))
 	for i, d := range steps {
 		result[i] = orbcore.OrbitToPosition(d)
+	}
+	return result
+}
+
+// RainbowList returns a list of colours
+func RainbowList(numOfSteps int) []color.RGBA {
+	result := make([]color.RGBA, numOfSteps)
+	for i := 0; i < numOfSteps; i++ {
+		result[i] = Rainbow(numOfSteps, i)
 	}
 	return result
 }
