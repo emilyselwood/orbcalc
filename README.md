@@ -1,6 +1,8 @@
 # orbcalc
 
-A library to do orbital mechanics in go. Used to generate [this video](https://www.youtube.com/watch?v=gj_9ODhmFyk)
+A library to do orbital mechanics in go.
+
+[![Every object in the solar system](http://img.youtube.com/vi/gj_9ODhmFyk/0.jpg)](http://www.youtube.com/watch?v=gj_9ODhmFyk)
 
 Currently very basic and work in progress, the basic orbital propogation with the mean motion method should work for most cases.
 Hyperbolic and parabolic orbits have not been tested, if you find bugs please let us know.
