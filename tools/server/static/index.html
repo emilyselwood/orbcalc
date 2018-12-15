@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8>
+		<title>Asteroids Orbits</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+        <div id="container"></div>
+        <script src="js/three.js"></script>
+        <script src="js/OrbitControls.js"></script>
+        <script src="js/WebGL.js"></script>
+        <script src="js/stats.min.js"></script>
+		<script>
+			if ( WEBGL.isWebGLAvailable() === false ) {
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+			}
+
+			var container;
+			var camera, scene, renderer;
+            var scale = 1000000;
+            var controls;
+            var stats;
+			init();
+			
+			function init() {
+
+
+                container = document.getElementById( 'container' );
+                renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
+                renderer.setPixelRatio( window.devicePixelRatio );
+                renderer.setSize( window.innerWidth, window.innerHeight );
+                container.appendChild( renderer.domElement );
+
+                stats = new Stats();
+                container.appendChild( stats.dom );
+                //
+                camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 10, 100000 );
+                camera.position.z = 60;
+                //camera.rotation.x = 90;
+                controls = new THREE.OrbitControls( camera );
+                
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color( 0x000005 );
+                scene.fog = new THREE.Fog( 0x050505, 10000, 100000 );
+                
+                window.addEventListener( 'resize', onWindowResize, false );
+
+                THREE.Cache.enabled = true;
+            
+                for (var i = 0; i < 16; i++) {
+                    loadAsteroidBatch(i);
+                }
+
+                var majorPlanets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"];
+                var colours = [new THREE.Color(1,0,0), new THREE.Color(0,1,0), new THREE.Color(0,0,1),
+                    new THREE.Color(1,1,0), new THREE.Color(1,0,1), new THREE.Color(0,1,1),
+                    new THREE.Color(0,1,0), new THREE.Color(1,0,0)];
+
+                for (var i = 0; i < majorPlanets.length; i++) {
+                    loadMajorPlanet(majorPlanets[i], colours[i])
+                }
+
+                createSun();
+
+                console.log("animating")
+                animate();
+                console.log("done")
+				
+            }
+            
+            function loadMajorPlanet(name, color) {
+                loadData("data/" +name+ ".csv", 
+                new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } ),
+                color,
+                THREE.Line);
+            }
+
+            function loadAsteroidBatch(batch) {
+                loadData("data/data-" + batch + ".csv", 
+                new THREE.PointsMaterial( { size: 1, vertexColors: THREE.VertexColors } ),
+                new THREE.Color(1,1,1),
+                THREE.Points);
+            }
+
+            function createSun() {
+                var positions = [0, 0, 0];
+                var colors = [1,1,0];
+
+                var geometry = new THREE.BufferGeometry();
+                geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+                geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+                geometry.computeBoundingSphere();
+                //
+                
+                var points = new THREE.Points( geometry, new THREE.PointsMaterial( { size: 1, vertexColors: THREE.VertexColors } ));
+                scene.add( points );
+            }
+
+            function loadData(name, mat, color, T) {
+                var loader = new THREE.FileLoader();
+                
+                //load a text file and output the result to the console
+                loader.load(
+                    // resource URL
+                    name,
+                    // onLoad callback
+                    function ( data ) {
+                        // output the text to the console
+                        console.log( "loaded" )
+
+                        var bits = createGeom(data, color);
+                        var positions = bits[0];
+                        var colors = bits[1];
+
+                        var geometry = new THREE.BufferGeometry();
+                        geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+                        geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+                        geometry.computeBoundingSphere();
+                        //
+                        
+                        var points = new T( geometry, mat);
+                        scene.add( points );
+                        
+                    },
+
+                    // onProgress callback
+                    function ( xhr ) {
+                        console.log( (xhr.loaded / xhr.total * 100) + '% loaded ' + xhr.loaded + ' of ' + xhr.total );
+                    },
+
+                    // onError callback
+                    function ( err ) {
+                        console.error( 'An error happened' );
+                    }
+                );
+            }
+
+            function createGeom(data, color) {
+                var positions = [];
+				var colors = [];
+                var lines = data.split(/\r?\n/)
+                var n = lines.length
+                var maxDistance = 0
+                console.log("got " + n + " lines")
+                for (var i = 0; i < n; i++) {
+                    if (lines[i] != "") {
+                        parts = lines[i].split(",")
+
+                        var x = parseFloat(parts[0])
+                        var y = parseFloat(parts[1])
+                        var z = parseFloat(parts[2])
+                        if (isNaN(x) || isNaN(y) || isNaN(z)) {
+                            console.log("could not decode " + lines[i] + " line " + i)
+                        } else {
+
+                            x = x / scale;
+                            y = y / scale;
+                            z = z / scale;
+                            positions.push( x, z, y ); // swap z and y around so we get more intuitve controls
+                        
+                            if (x > maxDistance) {
+                                maxDistance = x
+                            }
+                            if (y > maxDistance) {
+                                maxDistance = y
+                            }
+                            if (z > maxDistance) {
+                                maxDistance = z
+                            }
+                            
+                            var vx = ( x / n ) + 0.5;
+                            var vy = ( y / n ) + 0.5;
+                            var vz = ( z / n ) + 0.5;
+                            colors.push( color.r, color.g, color.b );
+                        }
+                    }
+                }
+                console.log("parsed " + positions.length + " max: " + maxDistance);
+                return [positions, colors]
+            }
+
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+			
+			function animate() {
+                requestAnimationFrame( animate );
+                controls.update();
+                //console.log("pos:" + camera.position.x + ":" + camera.position.y + ":" + camera.position.z)
+                //console.log("rot:" + camera.rotation.x + ":" + camera.rotation.y + ":" + camera.rotation.z)
+                stats.update();
+                render();
+			}
+
+			function render() {
+                //var time = Date.now() * 0.001;
+                
+				//points.rotation.x = time * 0.25;
+				//points.rotation.y = time * 0.25;
+				renderer.render( scene, camera );
+			}
+		</script>
+	</body>
+</html>

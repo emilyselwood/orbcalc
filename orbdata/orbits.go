@@ -14,7 +14,7 @@ var MercuryOrbit = orbcore.Orbit{
 	MeanAnomalyEpoch:            0.7363828677023899,  // rad
 	ArgumentOfPerihelion:        1.290398137330985,   // rad
 	LongitudeOfTheAscendingNode: 0.19016162418731905, // rad
-	InclinationToTheEcliptic:    0.49631875502968364, // rad
+	InclinationToTheEcliptic:    0.122258,            // rad
 	OrbitalEccentricity:         0.2161872518335417,
 	SemimajorAxis:               5.7909176e7, // km
 }
@@ -27,7 +27,7 @@ var VenusOrbit = orbcore.Orbit{
 	MeanAnomalyEpoch:            6.024347789858294,   // rad
 	ArgumentOfPerihelion:        1.8790979389622697,  // rad
 	LongitudeOfTheAscendingNode: 0.13963804205942293, // rad
-	InclinationToTheEcliptic:    0.4262177743625745,  // rad
+	InclinationToTheEcliptic:    0.0592489,           // rad
 	OrbitalEccentricity:         0.017361719534212148,
 	SemimajorAxis:               1.0820893e8, // km
 }
@@ -40,7 +40,7 @@ var EarthOrbit = orbcore.Orbit{
 	MeanAnomalyEpoch:            6.039693392708146,     // rad
 	ArgumentOfPerihelion:        1.4877567222443007,    // rad
 	LongitudeOfTheAscendingNode: 8.219803446009808e-05, // rad
-	InclinationToTheEcliptic:    0.40898784995301246,   // rad
+	InclinationToTheEcliptic:    0.9e-07,               // rad
 	OrbitalEccentricity:         0.023506053256160484,
 	SemimajorAxis:               1.49597887e8, // km
 }
@@ -53,7 +53,7 @@ var MarsOrbit = orbcore.Orbit{
 	MeanAnomalyEpoch:            0.9016227920497925,   // rad
 	ArgumentOfPerihelion:        5.804221558977953,    // rad
 	LongitudeOfTheAscendingNode: 0.059136325715984754, // rad
-	InclinationToTheEcliptic:    0.4306425759156045,   // rad
+	InclinationToTheEcliptic:    0.0322992,            // rad
 	OrbitalEccentricity:         0.09853112210172534,
 	SemimajorAxis:               2.27936637e8, // km
 }
@@ -66,7 +66,7 @@ var JupiterOrbit = orbcore.Orbit{
 	MeanAnomalyEpoch:            3.986624571747394,    // rad
 	ArgumentOfPerihelion:        0.22894709895829354,  // rad
 	LongitudeOfTheAscendingNode: 0.056682739190454204, // rad
-	InclinationToTheEcliptic:    0.4055370674873474,   // rad
+	InclinationToTheEcliptic:    0.0227818,            // rad
 	OrbitalEccentricity:         0.05041232826440195,
 	SemimajorAxis:               7.78412027e8, // km
 }
@@ -79,7 +79,7 @@ var SaturnOrbit = orbcore.Orbit{
 	MeanAnomalyEpoch:            3.2720797523951766,  // rad
 	ArgumentOfPerihelion:        1.5276434137035415,  // rad
 	LongitudeOfTheAscendingNode: 0.10399170848152173, // rad
-	InclinationToTheEcliptic:    0.3935856981200057,  // rad
+	InclinationToTheEcliptic:    0.043362,            // rad
 	OrbitalEccentricity:         0.05853326249640754,
 	SemimajorAxis:               1.42672541e9, // km
 }
@@ -92,7 +92,7 @@ var UranusOrbit = orbcore.Orbit{
 	MeanAnomalyEpoch:            3.8644829632802806,  // rad
 	ArgumentOfPerihelion:        2.926548412800625,   // rad
 	LongitudeOfTheAscendingNode: 0.03235322856941487, // rad
-	InclinationToTheEcliptic:    0.41301610249581455, // rad
+	InclinationToTheEcliptic:    0.013437,            // rad
 	OrbitalEccentricity:         0.044645557888114,
 	SemimajorAxis:               2.87097222e9, // km
 }
@@ -105,7 +105,7 @@ var NeptuneOrbit = orbcore.Orbit{
 	MeanAnomalyEpoch:            5.100969108525634,    // rad
 	ArgumentOfPerihelion:        0.8712884041923264,   // rad
 	LongitudeOfTheAscendingNode: 0.060720496894987035, // rad
-	InclinationToTheEcliptic:    0.38917080895523476,  // rad
+	InclinationToTheEcliptic:    0.0308778,            // rad
 	OrbitalEccentricity:         0.011600603763700122,
 	SemimajorAxis:               4.49825291e9, // km
 }

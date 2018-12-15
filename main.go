@@ -13,7 +13,6 @@ import (
 	"github.com/wselwood/gompcreader"
 	"github.com/wselwood/orbcalc/orbconvert"
 	"github.com/wselwood/orbcalc/orbcore"
-	"github.com/wselwood/orbcalc/orbdata"
 
 	"github.com/paulbellamy/ratecounter"
 )
@@ -142,9 +141,11 @@ func stageMeanMotion(in chan *orbcore.Orbit, output chan *orbcore.Position, wg *
 	defer wg.Done()
 	oneDay := 24 * time.Hour
 	for orb := range in {
-		r := orbcore.MeanMotionStepped(orbdata.SunGrav, orb, oneDay, 2000)
+		log.Println(orb.Epoch)
+
+		r := orbcore.MeanMotionStepped(orb, oneDay, 2000)
 		for _, o := range r {
-			output <- orbcore.OrbitToPosition(o,orbdata.SunGrav)
+			output <- orbcore.OrbitToPosition(o)
 		}
 		counter.Incr(1)
 	}

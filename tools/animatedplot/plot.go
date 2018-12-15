@@ -33,7 +33,7 @@ const channelSize = 100000
 var inputfile = flag.String("in", "", "the minor planet center file to read")
 var outputPath = flag.String("out", "", "path to output files")
 var count = flag.Int("count", 6000, "number of frames to run")
-var maxSemiMajorAxis = flag.Float64("max", 15, "maximum semimajor axis to accept, in AU")
+var maxSemiMajorAxis = flag.Float64("max", 7, "maximum semimajor axis to accept, in AU")
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 
 /*
@@ -72,7 +72,7 @@ func main() {
 		go func() {
 			defer saveWait.Done()
 			for s := range saveChan {
-				if err := s.plot.Save(7400, 7400, s.filename); err != nil {
+				if err := s.plot.Save(10000, 10000, s.filename); err != nil {
 					panic(err)
 				}
 			}
@@ -224,7 +224,7 @@ func stagePlot(days int64, in chan *orbcore.Position, saveChan chan *savePack, o
 		panic(err)
 	}
 
-	filename := filepath.Join(outputPath, fmt.Sprintf("frame_%05d.png", days))
+	filename := filepath.Join(outputPath, fmt.Sprintf("frame_%05d.svg", days))
 	saveChan <- &savePack{
 		filename: filename,
 		plot:     p,
