@@ -4,6 +4,7 @@ orbcalc
 tools/verification/verification
 tools/diff/diff
 tools/animatedplot/animatedplot
+tools/server/server
 examples/plot/plot
 examples/plotsolar/plotsolar
 output.txt
