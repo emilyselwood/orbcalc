@@ -49,7 +49,7 @@
                 stats = new Stats();
                 container.appendChild( stats.dom );
                 //
-                camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 10, 100000 );
+                camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 3, 100000 );
                 camera.position.z = 60;
                 //camera.rotation.x = 90;
                 controls = new THREE.OrbitControls( camera );
