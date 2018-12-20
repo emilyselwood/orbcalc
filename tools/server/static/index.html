@@ -33,25 +33,25 @@
             var scale = 1000000;
             var controls;
             var stats;
+            var sprite;
 			init();
-			
-
             
 			function init() {
-
                 container = document.getElementById( 'container' );
+
                 renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
                 renderer.setPixelRatio( window.devicePixelRatio );
                 renderer.setSize( window.innerWidth, window.innerHeight );
-
                 container.appendChild( renderer.domElement );
-                document.body.appendChild( WEBVR.createButton( renderer ) );
+
                 stats = new Stats();
                 container.appendChild( stats.dom );
-                //
+
+                document.body.appendChild( WEBVR.createButton( renderer ) );
+
                 camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 3, 100000 );
                 camera.position.z = 60;
-                //camera.rotation.x = 90;
+
                 controls = new THREE.OrbitControls( camera );
                 
                 scene = new THREE.Scene();
@@ -60,6 +60,9 @@
                 
                 THREE.Cache.enabled = true;
             
+                var loader = new THREE.TextureLoader();
+				sprite = loader.load( 'img/particle2.png' );
+
                 for (var i = 0; i < 16; i++) {
                     loadAsteroidBatch(i);
                 }
@@ -89,9 +92,7 @@
             }
 
             function loadAsteroidBatch(batch) {
-                var loader = new THREE.TextureLoader();
-				var sprite = loader.load( 'img/particle2.png' );
-
+                
                 loadData("data/data-" + batch + ".csv", 
                 new THREE.PointsMaterial( { size: 1, vertexColors: THREE.VertexColors, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true} ),
                 new THREE.Color(0.9,0.9,1),
@@ -108,7 +109,7 @@
                 geometry.computeBoundingSphere();
                 //
                 
-                var points = new THREE.Points( geometry, new THREE.PointsMaterial( { size: 1, vertexColors: THREE.VertexColors } ));
+                var points = new THREE.Points( geometry, new THREE.PointsMaterial( { size: 10, vertexColors: THREE.VertexColors, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } ));
                 scene.add( points );
             }
 
@@ -121,9 +122,6 @@
                     name,
                     // onLoad callback
                     function ( data ) {
-                        // output the text to the console
-                        console.log( "loaded " + name)
-
                         var bits = createGeom(data, color);
                         var positions = bits[0];
                         var colors = bits[1];
@@ -135,6 +133,7 @@
 
                         var points = new T( geometry, mat);
                         scene.add( points );
+                        console.log( "loaded " + name)
                     },
 
                     // onProgress callback
@@ -144,7 +143,7 @@
 
                     // onError callback
                     function ( err ) {
-                        console.error( 'An error happened' );
+                        console.error( 'An error happened loading ' + name );
                     }
                 );
             }
@@ -169,10 +168,6 @@
                             y = y / scale;
                             z = z / scale;
                             positions.push( x, z, y ); // swap z and y around so we get more intuitve controls
-                        
-                            var vx = ( x / n ) + 0.5;
-                            var vy = ( y / n ) + 0.5;
-                            var vz = ( z / n ) + 0.5;
                             colors.push( color.r, color.g, color.b );
                         }
                     }
