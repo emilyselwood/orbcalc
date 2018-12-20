@@ -38,12 +38,16 @@
             var mouse;
             var sphere;
             var pointsSet = [];
+            var dragFlag = 0;
 			init();
             
 			function init() {
                 document.addEventListener( 'mousemove', onDocumentMouseMove, false );
                 container = document.getElementById( 'container' );
                 container.addEventListener('click', onCanvasClick, false);
+                container.addEventListener("mousedown", function(){
+                    dragFlag = 0;
+                }, false);
 
                 renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
                 renderer.setPixelRatio( window.devicePixelRatio );
@@ -53,7 +57,10 @@
                 stats = new Stats();
                 container.appendChild( stats.dom );
 
-                document.body.appendChild( WEBVR.createButton( renderer ) );
+                var vrButton = WEBVR.createButton(renderer);
+                if (vrButton) {
+                    document.body.appendChild(vrButton);
+                }
 
                 camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 3, 100000 );
                 camera.position.z = 60;
@@ -62,7 +69,6 @@
                 
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color( 0x000005 );
-                scene.fog = new THREE.Fog( 0x050505, 10000, 100000 );
                 
                 raycaster = new THREE.Raycaster();
 				mouse = new THREE.Vector2();
@@ -213,11 +219,15 @@
             function onDocumentMouseMove( event ) {
 				event.preventDefault();
 				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+                mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+                dragFlag = 1;                
 			}
 
             function onCanvasClick(event) {
-                raycastCheck();
+                if (dragFlag == 0) {
+                    raycastCheck();
+                }  
+                dragFlag = 0
             }
 
             function resize() {
