@@ -34,10 +34,16 @@
             var controls;
             var stats;
             var sprite;
+            var raycaster
+            var mouse;
+            var sphere;
+            var pointsSet = [];
 			init();
             
 			function init() {
+                document.addEventListener( 'mousemove', onDocumentMouseMove, false );
                 container = document.getElementById( 'container' );
+                container.addEventListener('click', onCanvasClick, false);
 
                 renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
                 renderer.setPixelRatio( window.devicePixelRatio );
@@ -58,6 +64,9 @@
                 scene.background = new THREE.Color( 0x000005 );
                 scene.fog = new THREE.Fog( 0x050505, 10000, 100000 );
                 
+                raycaster = new THREE.Raycaster();
+				mouse = new THREE.Vector2();
+
                 THREE.Cache.enabled = true;
             
                 var loader = new THREE.TextureLoader();
@@ -78,17 +87,22 @@
 
                 createSun();
 
-                console.log("animating")
+
+                // Create ray cast target sphere:
+                var sphereGeometry = new THREE.SphereBufferGeometry( 1, 120, 0 );
+				var sphereMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+                sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+                scene.add( sphere );
+
                 animate();
-                console.log("done")
-				
             }
             
             function loadMajorPlanet(name, color) {
                 loadData("data/" +name+ ".csv", 
                 new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } ),
                 color,
-                THREE.Line);
+                THREE.Line,
+                false);
             }
 
             function loadAsteroidBatch(batch) {
@@ -96,7 +110,7 @@
                 loadData("data/data-" + batch + ".csv", 
                 new THREE.PointsMaterial( { size: 1, vertexColors: THREE.VertexColors, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true} ),
                 new THREE.Color(0.9,0.9,1),
-                THREE.Points);
+                THREE.Points, true);
             }
 
             function createSun() {
@@ -107,13 +121,12 @@
                 geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
                 geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
                 geometry.computeBoundingSphere();
-                //
                 
                 var points = new THREE.Points( geometry, new THREE.PointsMaterial( { size: 10, vertexColors: THREE.VertexColors, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } ));
                 scene.add( points );
             }
 
-            function loadData(name, mat, color, T) {
+            function loadData(name, mat, color, T, raytarget) {
                 var loader = new THREE.FileLoader();
                 
                 //load a text file and output the result to the console
@@ -132,6 +145,9 @@
                         geometry.computeBoundingSphere();
 
                         var points = new T( geometry, mat);
+                        if(raytarget){
+                            pointsSet.push(points);
+                        }
                         scene.add( points );
                         console.log( "loaded " + name)
                     },
@@ -175,12 +191,33 @@
                 return [positions, colors]
             }
 
+            function raycastCheck() {
+                raycaster.setFromCamera( mouse, camera );
+				var intersections = raycaster.intersectObjects(pointsSet );
+                intersection = ( intersections.length ) > 0 ? intersections[ 0 ] : null;
+                
+                if ( intersection !== null) {
+					sphere.position.copy( intersection.point );
+					sphere.scale.set( 1, 1, 1 );
+				}
+            }
+
             function needsResize(canvas) {
                 if (canvas.lastWidth !== canvas.clientWidth || canvas.lastHeight !== canvas.clientHeight) {
                     canvas.width = canvas.lastWidth = canvas.clientWidth;
                     canvas.height = canvas.lastHeight = canvas.clientHeight;
                     return true;
                 }
+            }
+
+            function onDocumentMouseMove( event ) {
+				event.preventDefault();
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+			}
+
+            function onCanvasClick(event) {
+                raycastCheck();
             }
 
             function resize() {
@@ -203,6 +240,8 @@
                 if (! renderer.vr.getDevice() || !renderer.vr.getDevice().isPresenting) {
                     controls.update();
                 }
+
+                //raycastCheck();
                 stats.update();
                 render();
 			}
