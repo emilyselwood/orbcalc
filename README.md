@@ -7,12 +7,11 @@ A library to do orbital mechanics in go.
 Currently very basic and work in progress, the basic orbital propogation with the mean motion method should work for most cases.
 Hyperbolic and parabolic orbits have not been tested, if you find bugs please let us know.
 
-Example in main.go which reads in the MPC orbit file propogates them forward by one day and then writes the position vectors to a file
+Example in main.go which reads in the MPC orbit file propogates them forward by one day and then writes the position vectors to a file. See also the `example` and `tools` folders for more examples
 
 There is a lot still to do:
 
 * Reference frame transformations.
-* Built in data for earth orbits and major planets
 * Benchmarking
 * Documentation
 
@@ -50,7 +49,7 @@ cd orbcalc
 go build
 ```
 
-We use the Go module system which should take care of the dependencies for you.
+We use the Go module system which should take care of the dependencies for you. See the `examples` and `tools` folders for more information about usage
 
 ## Thanks
 

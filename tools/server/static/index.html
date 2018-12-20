@@ -4,8 +4,16 @@
 		<meta charset=utf-8>
 		<title>Asteroids Orbits</title>
 		<style>
-			body { margin: 0; }
 			canvas { width: 100%; height: 100% }
+            head, body{
+                width:100%;
+                height:100%;
+                overflow: hidden;
+                top:0;
+                left:0;
+                margin:0;
+                padding:0;
+            }
 		</style>
 	</head>
 	<body>
@@ -35,25 +43,21 @@
                 renderer = new THREE.WebGLRenderer( { antialias: true, logarithmicDepthBuffer: true } );
                 renderer.setPixelRatio( window.devicePixelRatio );
                 renderer.setSize( window.innerWidth, window.innerHeight );
-                renderer.vr.enabled = true;
-
 
                 container.appendChild( renderer.domElement );
-                document.body.appendChild( WebVR.createButton( renderer ) );
+                document.body.appendChild( WEBVR.createButton( renderer ) );
                 stats = new Stats();
                 container.appendChild( stats.dom );
                 //
                 camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 10, 100000 );
                 camera.position.z = 60;
                 //camera.rotation.x = 90;
-                //controls = new THREE.OrbitControls( camera );
+                controls = new THREE.OrbitControls( camera );
                 
                 scene = new THREE.Scene();
                 scene.background = new THREE.Color( 0x000005 );
                 scene.fog = new THREE.Fog( 0x050505, 10000, 100000 );
                 
-                window.addEventListener( 'resize', onWindowResize, false );
-
                 THREE.Cache.enabled = true;
             
                 for (var i = 0; i < 16; i++) {
@@ -85,9 +89,12 @@
             }
 
             function loadAsteroidBatch(batch) {
+                var loader = new THREE.TextureLoader();
+				var sprite = loader.load( 'img/particle2.png' );
+
                 loadData("data/data-" + batch + ".csv", 
-                new THREE.PointsMaterial( { size: 1, vertexColors: THREE.VertexColors } ),
-                new THREE.Color(1,1,1),
+                new THREE.PointsMaterial( { size: 1, vertexColors: THREE.VertexColors, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true} ),
+                new THREE.Color(0.9,0.9,1),
                 THREE.Points);
             }
 
@@ -115,7 +122,7 @@
                     // onLoad callback
                     function ( data ) {
                         // output the text to the console
-                        console.log( "loaded" )
+                        console.log( "loaded " + name)
 
                         var bits = createGeom(data, color);
                         var positions = bits[0];
@@ -125,16 +132,14 @@
                         geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
                         geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
                         geometry.computeBoundingSphere();
-                        //
-                        
+
                         var points = new T( geometry, mat);
                         scene.add( points );
-                        
                     },
 
                     // onProgress callback
                     function ( xhr ) {
-                        console.log( (xhr.loaded / xhr.total * 100) + '% loaded ' + xhr.loaded + ' of ' + xhr.total );
+                        console.log( name + ": " + (xhr.loaded / xhr.total * 100) + '% loaded ' );
                     },
 
                     // onError callback
@@ -149,8 +154,6 @@
 				var colors = [];
                 var lines = data.split(/\r?\n/)
                 var n = lines.length
-                var maxDistance = 0
-                console.log("got " + n + " lines")
                 for (var i = 0; i < n; i++) {
                     if (lines[i] != "") {
                         parts = lines[i].split(",")
@@ -167,16 +170,6 @@
                             z = z / scale;
                             positions.push( x, z, y ); // swap z and y around so we get more intuitve controls
                         
-                            if (x > maxDistance) {
-                                maxDistance = x
-                            }
-                            if (y > maxDistance) {
-                                maxDistance = y
-                            }
-                            if (z > maxDistance) {
-                                maxDistance = z
-                            }
-                            
                             var vx = ( x / n ) + 0.5;
                             var vy = ( y / n ) + 0.5;
                             var vz = ( z / n ) + 0.5;
@@ -184,30 +177,42 @@
                         }
                     }
                 }
-                console.log("parsed " + positions.length + " max: " + maxDistance);
                 return [positions, colors]
             }
 
-			function onWindowResize() {
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-				renderer.setSize( window.innerWidth, window.innerHeight );
-			}
+            function needsResize(canvas) {
+                if (canvas.lastWidth !== canvas.clientWidth || canvas.lastHeight !== canvas.clientHeight) {
+                    canvas.width = canvas.lastWidth = canvas.clientWidth;
+                    canvas.height = canvas.lastHeight = canvas.clientHeight;
+                    return true;
+                }
+            }
+
+            function resize() {
+                if (needsResize(container)) {
+                    var w = container.clientWidth;
+                    var h = container.clientHeight;
+                    camera.aspect = w / h;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(w, h, false);
+                }
+            }
 			
 			function animate() {
-                requestAnimationFrame( animate );
-                //controls.update();
-                //console.log("pos:" + camera.position.x + ":" + camera.position.y + ":" + camera.position.z)
-                //console.log("rot:" + camera.rotation.x + ":" + camera.rotation.y + ":" + camera.rotation.z)
+                if (!renderer.domElement.parentElement) {
+                    return;
+                }
+                requestAnimationFrame(animate);
+                resize();
+                // if vr is enabled three will handle the controls for us.
+                if (! renderer.vr.getDevice() || !renderer.vr.getDevice().isPresenting) {
+                    controls.update();
+                }
                 stats.update();
                 render();
 			}
 
 			function render() {
-                //var time = Date.now() * 0.001;
-                
-				//points.rotation.x = time * 0.25;
-				//points.rotation.y = time * 0.25;
 				renderer.render( scene, camera );
 			}
 		</script>
