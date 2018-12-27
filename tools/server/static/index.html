@@ -144,6 +144,7 @@
                         var bits = createGeom(data, color);
                         var positions = bits[0];
                         var colors = bits[1];
+                        var ids = bits[2];
 
                         var geometry = new THREE.BufferGeometry();
                         geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
@@ -151,6 +152,9 @@
                         geometry.computeBoundingSphere();
 
                         var points = new T( geometry, mat);
+                        if (ids.length > 0) {
+                            points.userData = {IDS: ids};
+                        }
                         if(raytarget){
                             pointsSet.push(points);
                         }
@@ -169,21 +173,37 @@
                     }
                 );
             }
-
+ 
             function createGeom(data, color) {
                 var positions = [];
-				var colors = [];
-                var lines = data.split(/\r?\n/)
-                var n = lines.length
+                var colors = [];
+                var ids = [];
+                var lines = data.split(/\r?\n/);
+                var n = lines.length;
                 for (var i = 0; i < n; i++) {
                     if (lines[i] != "") {
                         parts = lines[i].split(",")
+                        var id = "";
+                        var x = 0.0;
+                        var y = 0.0;
+                        var z = 0.0;
 
-                        var x = parseFloat(parts[0])
-                        var y = parseFloat(parts[1])
-                        var z = parseFloat(parts[2])
+                        if (parts.length == 4) {
+                            id = parts[0];
+                            x = parseFloat(parts[1]);
+                            y = parseFloat(parts[2]);
+                            z = parseFloat(parts[3]);
+                        } else if (parts.length == 3) {
+                            x = parseFloat(parts[0]);
+                            y = parseFloat(parts[1]);
+                            z = parseFloat(parts[2]);
+                        } else {
+                            console.log("could not decode line " + i);
+                            continue;
+                        }
+                        
                         if (isNaN(x) || isNaN(y) || isNaN(z)) {
-                            console.log("could not decode " + lines[i] + " line " + i)
+                            console.log("could not decode " + lines[i] + " line " + i);
                         } else {
 
                             x = x / scale;
@@ -191,10 +211,13 @@
                             z = z / scale;
                             positions.push( x, z, y ); // swap z and y around so we get more intuitve controls
                             colors.push( color.r, color.g, color.b );
+                            if (id != "") {
+                                ids.push(id);
+                            }
                         }
                     }
                 }
-                return [positions, colors]
+                return [positions, colors, ids];
             }
 
             function raycastCheck() {

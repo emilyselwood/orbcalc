@@ -3,12 +3,14 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/wselwood/gompcreader"
 	"github.com/wselwood/orbcalc/orbconvert"
@@ -75,8 +77,11 @@ func generateData() {
 
 		orb := orbconvert.ConvertFromMinorPlanet(result)
 		pos := orbcore.OrbitToPosition(orb)
-
-		fmt.Fprintf(outFiles[count%numFiles], "%v,%v,%v\n", pos.X, pos.Y, pos.Z)
+		i := count % numFiles
+		fmt.Fprintf(outFiles[i], "%s,%v,%v,%v\n", pos.ID, pos.X, pos.Y, pos.Z)
+		// if err := saveOrbitFile(orb, i); err != nil {
+		// 	log.Fatal("could not generate orbit file", err)
+		// }
 		count++
 		result, err = mpcReader.ReadEntry()
 	}
@@ -116,4 +121,67 @@ func fileForPlanet(orb orbcore.Orbit) error {
 	}
 
 	return nil
+}
+
+func saveOrbitFile(orb *orbcore.Orbit, set int) error {
+	filepath := fmt.Sprintf("%s/%v", dataStorePath, set)
+	os.MkdirAll(filepath, os.ModePerm)
+	filename := fmt.Sprintf("%s/%v/%s.json", dataStorePath, set, orb.ID)
+
+	obj := generateOrbitData(orb)
+
+	f, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+
+	enc := json.NewEncoder(f)
+	enc.Encode(obj)
+	return nil
+}
+
+func generateOrbitData(orb *orbcore.Orbit) *objectData {
+	var result objectData
+
+	result.Epoch = orb.Epoch
+	result.MeanAnomalyEpoch = orb.MeanAnomalyEpoch
+	result.ArgumentOfPerihelion = orb.ArgumentOfPerihelion
+	result.LongitudeOfTheAscendingNode = orb.LongitudeOfTheAscendingNode
+	result.InclinationToTheEcliptic = orb.InclinationToTheEcliptic
+	result.OrbitalEccentricity = orb.OrbitalEccentricity
+	result.MeanDailyMotion = orb.MeanDailyMotion
+	result.SemimajorAxis = orb.SemimajorAxis
+
+	positions := orbcore.MeanMotionFullOrbit(orb, 366)
+	result.Orbit = make([]point, len(positions))
+	for i, p := range positions {
+		pos := orbcore.OrbitToPosition(p)
+		result.Orbit[i] = point{
+			X: pos.X,
+			Y: pos.Y,
+			Z: pos.Z,
+		}
+	}
+
+	return &result
+}
+
+type objectData struct {
+	Epoch                       time.Time
+	MeanAnomalyEpoch            float64 // nu
+	ArgumentOfPerihelion        float64 // w argp
+	LongitudeOfTheAscendingNode float64 // omega raan
+	InclinationToTheEcliptic    float64 // i inc
+	OrbitalEccentricity         float64 // e ecc
+	MeanDailyMotion             float64
+	SemimajorAxis               float64 // a p
+	Orbit                       []point
+}
+
+type point struct {
+	X float64
+	Y float64
+	Z float64
 }
