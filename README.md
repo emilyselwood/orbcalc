@@ -54,3 +54,10 @@ We use the Go module system which should take care of the dependencies for you. 
 ## Thanks
 
 This project owes a great debt of thanks to the [poliastro project](https://github.com/poliastro/poliastro) for the algorithms and examples of how things should be done.
+
+### Contributors
+
+The following people have helped improve this project:
+
+* [Wil Selwood](https://github.com/wselwood)
+* [Brian Peiris](https://github.com/brianpeiris) [Fixing the vr mode](https://github.com/wselwood/orbviewer/pull/1) in [OrbViewer](https://parsecsreach.com/orbviewer)
