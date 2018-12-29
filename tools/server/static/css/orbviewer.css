@@ -1,0 +1,68 @@
+canvas { 
+    width: 100%; 
+    height: 100% 
+}
+
+head, body{
+    width:100%;
+    height:100%;
+    overflow: hidden;
+    top:0;
+    left:0;
+    margin:0;
+    padding:0;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif
+}
+
+#clickLabel {
+    width:100%;
+    position: fixed;
+    left:0;
+    bottom:0;
+    height:40pt;
+    padding: 4pt;
+    font-size: 20pt;
+    z-index: 2;
+    color: rgba(255, 255, 255, 1);
+}
+
+#clickLabel a {
+    color: rgba(255, 255, 255, 1);
+    text-decoration: underline;
+    display: block;
+    z-index: 2;
+}
+
+#helpcontainer {
+    position: fixed; /* Sit on top of the page content */
+    display: none;
+    width: 100%; /* Full width (cover the whole page) */
+    height: 100%; /* Full height (cover the whole page) */
+    top: 0; 
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.9); /* Black background with opacity */
+    color: rgba(255, 255, 255, 1);
+    z-index: 2;
+    cursor: pointer;
+    text-align: center;
+}
+
+#helpcontainer p {
+    position:relative;
+    width: 75%;
+    left: 12.5%;
+    text-align: left;
+}
+
+#helpbutton{
+    position: fixed;
+    font-size: 14pt;
+    color: rgba(255, 255, 255, 0.75);
+    right: 14pt; 
+    top: 0;
+    z-index: 4;
+    cursor: pointer;
+    text-align: center;
+}
