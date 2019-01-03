@@ -44,7 +44,7 @@ head, body{
     bottom: 0;
     background-color: rgba(0,0,0,0.9); /* Black background with opacity */
     color: rgba(255, 255, 255, 1);
-    z-index: 2;
+    z-index: 4;
     cursor: pointer;
     text-align: center;
 }
