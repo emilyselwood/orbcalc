@@ -46,5 +46,5 @@ func main() {
 }
 
 func compareRows(a *orbcore.Position, b *orbcore.Position) float64 {
-	return (math.Abs(a.X-b.X) + math.Abs(a.Y-b.Y) + math.Abs(a.Z-b.Z))
+	return math.Abs(a.X-b.X) + math.Abs(a.Y-b.Y) + math.Abs(a.Z-b.Z)
 }

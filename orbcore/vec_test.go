@@ -48,20 +48,21 @@ func TestQuickerRotationMatrixForOrbit(t *testing.T) {
 }
 
 func TestTestQuickerRotationMatrixForOrbitLong(t *testing.T) {
-	for i := 0.0; i < 180.0; i = i + 0.1 {
+	point := []float64{5e+10, 5e+10, 10}
+	for i := 0.0; i < 180.0; i = i+0.10101{
 		t.Run(fmt.Sprintf("deg:%v", i), func(t2 *testing.T) {
 			angle := float64(i) * math.Pi / 180.0
 
-			result1 := Rotate(mat.NewVecDense(3, []float64{5e+09, 5e+9, 0}), angle, AxisZ)
+			result1 := Rotate(mat.NewVecDense(3, point), angle, AxisZ)
 			result1 = Rotate(result1, angle, AxisX)
 			result1 = Rotate(result1, angle, AxisZ)
 
 			rot2 := QuickerRotationMatrixForOrbit(angle, angle, angle)
 
-			result2 := mat.NewVecDense(3, []float64{5e+9, 5e+9, 0})
+			result2 := mat.NewVecDense(3, point)
 			result2.MulVec(rot2, result2)
 
-			if !mat.EqualApprox(result1, result2, 0.0000001) {
+			if !mat.EqualApprox(result1, result2, 0.0000000001) {
 				t2.Log("\nresult1:", mat.Formatted(result1, mat.Prefix("result1: "), mat.Squeeze()))
 				t2.Log("\nresult2:", mat.Formatted(result2, mat.Prefix("result2: "), mat.Squeeze()))
 				t2.Fail()

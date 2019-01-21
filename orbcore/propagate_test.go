@@ -2,8 +2,6 @@ package orbcore
 
 import (
 	"testing"
-
-	"github.com/wselwood/orbcalc/orbdata"
 )
 
 func TestLoopingProblem(t *testing.T) {
@@ -12,6 +10,7 @@ func TestLoopingProblem(t *testing.T) {
 	// This test is here to make sure it does not come back.
 	orb := Orbit{
 		ID:                          "1996 PW",
+		ParentGrav:                  132712442099.00002,
 		MeanAnomalyEpoch:            0.03539440456581901,
 		ArgumentOfPerihelion:        3.169512336568096,
 		LongitudeOfTheAscendingNode: 2.519967809619083,
@@ -20,5 +19,5 @@ func TestLoopingProblem(t *testing.T) {
 		SemimajorAxis:               3.79035922723884e+10,
 	}
 
-	_ = MeanMotion(orbdata.SunGrav, &orb, 1*24*60*60)
+	_ = MeanMotion(&orb, 1*24*60*60)
 }

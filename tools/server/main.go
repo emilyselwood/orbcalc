@@ -3,7 +3,6 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -39,13 +38,20 @@ func main() {
 	}
 
 	log.Println("starting server")
-	http.Handle("/", http.FileServer(http.Dir("static")))
+	fs := http.FileServer(http.Dir("static"))
+	
+	http.HandleFunc("/", logWrapper(fs.ServeHTTP))
 
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }
 
-// internal memory cache for the positions
-var positions []*orbcore.Position
+func logWrapper(child func(rw http.ResponseWriter, req *http.Request)) func(rw http.ResponseWriter, req *http.Request) {
+	return func(rw http.ResponseWriter, req *http.Request) {
+		startTime := time.Now()
+		child(rw, req)
+		log.Println(req.Method, req.URL.Path, time.Since(startTime))
+	}
+}
 
 func generateData() {
 
@@ -67,7 +73,9 @@ func generateData() {
 
 	defer func() {
 		for _, f := range outFiles {
-			f.Close()
+			if err := f.Close(); err != nil {
+				fmt.Println("Could not close file", err)
+			}
 		}
 	}()
 
@@ -78,10 +86,10 @@ func generateData() {
 		orb := orbconvert.ConvertFromMinorPlanet(result)
 		pos := orbcore.OrbitToPosition(orb)
 		i := count % numFiles
-		fmt.Fprintf(outFiles[i], "%s,%v,%v,%v\n", pos.ID, pos.X, pos.Y, pos.Z)
-		// if err := saveOrbitFile(orb, i); err != nil {
-		// 	log.Fatal("could not generate orbit file", err)
-		// }
+		if _, err := fmt.Fprintf(outFiles[i], "%s,%v,%v,%v\n", pos.ID, pos.X, pos.Y, pos.Z); err != nil {
+			log.Fatal("Could not write", err)
+		}
+
 		count++
 		result, err = mpcReader.ReadEntry()
 	}
@@ -112,61 +120,24 @@ func fileForPlanet(orb orbcore.Orbit) error {
 	if err != nil {
 		log.Fatal("error opening output file", err)
 	}
-	defer out.Close()
+	defer func(c *os.File) {
+		if err := c.Close(); err != nil {
+			fmt.Println("could not close", c, err)
+		}
+	}(out)
 
 	positions := orbcore.MeanMotionFullOrbit(&orb, 366)
 	for _, pos := range positions {
 		p := orbcore.OrbitToPosition(pos)
-		fmt.Fprintf(out, "%v,%v,%v\n", p.X, p.Y, p.Z)
-	}
-
-	return nil
-}
-
-func saveOrbitFile(orb *orbcore.Orbit, set int) error {
-	filepath := fmt.Sprintf("%s/%v", dataStorePath, set)
-	os.MkdirAll(filepath, os.ModePerm)
-	filename := fmt.Sprintf("%s/%v/%s.json", dataStorePath, set, orb.ID)
-
-	obj := generateOrbitData(orb)
-
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-
-	defer f.Close()
-
-	enc := json.NewEncoder(f)
-	enc.Encode(obj)
-	return nil
-}
-
-func generateOrbitData(orb *orbcore.Orbit) *objectData {
-	var result objectData
-
-	result.Epoch = orb.Epoch
-	result.MeanAnomalyEpoch = orb.MeanAnomalyEpoch
-	result.ArgumentOfPerihelion = orb.ArgumentOfPerihelion
-	result.LongitudeOfTheAscendingNode = orb.LongitudeOfTheAscendingNode
-	result.InclinationToTheEcliptic = orb.InclinationToTheEcliptic
-	result.OrbitalEccentricity = orb.OrbitalEccentricity
-	result.MeanDailyMotion = orb.MeanDailyMotion
-	result.SemimajorAxis = orb.SemimajorAxis
-
-	positions := orbcore.MeanMotionFullOrbit(orb, 366)
-	result.Orbit = make([]point, len(positions))
-	for i, p := range positions {
-		pos := orbcore.OrbitToPosition(p)
-		result.Orbit[i] = point{
-			X: pos.X,
-			Y: pos.Y,
-			Z: pos.Z,
+		if _, err := fmt.Fprintf(out, "%v,%v,%v\n", p.X, p.Y, p.Z); err != nil {
+			fmt.Println("Could not write file", err)
+			return err
 		}
 	}
 
-	return &result
+	return nil
 }
+
 
 type objectData struct {
 	Epoch                       time.Time

@@ -58,7 +58,7 @@ var WEBVR = {
 				currentSession.removeEventListener( 'end', onSessionEnded );
 
 				renderer.vr.setSession( null );
-				button.textContent = 'ENTER VR';
+				button.textContent = 'ENTER XR';
 
 				currentSession = null;
 
@@ -72,7 +72,7 @@ var WEBVR = {
 			button.style.left = 'calc(50% - 50px)';
 			button.style.width = '100px';
 
-			button.textContent = 'ENTER VR';
+			button.textContent = 'ENTER XR';
 
 			button.onmouseenter = function () { button.style.opacity = '1.0'; };
 			button.onmouseleave = function () { button.style.opacity = '0.5'; };
@@ -183,7 +183,7 @@ var WEBVR = {
 				.then( function ( displays ) {
 
 					if ( displays.length > 0 ) {
-
+						console.log("got " + displays.length + " possible vr displays");
 						showEnterVR( displays[ 0 ] );
 
 					} else {

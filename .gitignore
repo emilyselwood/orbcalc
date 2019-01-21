@@ -12,3 +12,4 @@ out.txt
 *.csv
 *.png
 .vscode/
+.idea/

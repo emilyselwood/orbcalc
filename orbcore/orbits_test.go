@@ -8,6 +8,7 @@ import (
 func TestOrbitalPeriod(t *testing.T) {
 	ceres := Orbit{
 		ID:                          "1",                                         // Ceres
+		ParentGrav:  132712442099.00002,
 		Epoch:                       time.Date(2018, 1, 1, 0, 0, 0, 0, time.UTC), // todo: real epoch times.
 		MeanAnomalyEpoch:            6.147582300011738,
 		ArgumentOfPerihelion:        1.2761023695175595,
@@ -17,7 +18,7 @@ func TestOrbitalPeriod(t *testing.T) {
 		SemimajorAxis:               4.1394459238740003e+08,
 	}
 
-	r := OrbitalPeriod(&ceres, 132712442099.00002)
+	r := OrbitalPeriod(&ceres)
 
 	expected, _ := time.ParseDuration("40349h11m39s")
 	if r != expected {

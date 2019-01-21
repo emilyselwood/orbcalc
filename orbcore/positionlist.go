@@ -42,12 +42,14 @@ func OrbitToPosition(orb *Orbit) *Position {
 /*
 ReadPositionFile opens a path an loads in a CSV formatted list of Positions
 */
-func ReadPositionFile(path string) ([]*Position, error) {
+func ReadPositionFile(path string) (pos []*Position, err error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer func(c *os.File) {
+		err = c.Close()
+	}(file)
 
 	return ReadPositions(file)
 }

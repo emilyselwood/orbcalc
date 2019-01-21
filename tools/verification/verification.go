@@ -21,7 +21,8 @@ import (
 
 var testObjects = []*orbcore.Orbit{
 	{
-		ID:                          "1996 PW",                                   // Very very eliptical that can cause problems.
+		ID:                          "1996 PW", // Very very eliptical that can cause problems.
+		ParentGrav:                  orbdata.SunGrav,
 		Epoch:                       time.Date(2018, 1, 1, 0, 0, 0, 0, time.UTC), // todo: real epoch times.
 		MeanAnomalyEpoch:            0.03539440456581901,
 		ArgumentOfPerihelion:        3.169512336568096,
@@ -31,7 +32,8 @@ var testObjects = []*orbcore.Orbit{
 		SemimajorAxis:               3.79035922723884e+10,
 	},
 	{
-		ID:                          "1",                                         // Ceres
+		ID:                          "1", // Ceres
+		ParentGrav:                  orbdata.SunGrav,
 		Epoch:                       time.Date(2018, 1, 1, 0, 0, 0, 0, time.UTC), // todo: real epoch times.
 		MeanAnomalyEpoch:            6.147582300011738,
 		ArgumentOfPerihelion:        1.2761023695175595,
@@ -70,8 +72,8 @@ func processOrbit(orb *orbcore.Orbit, outDir string) error {
 
 	defer f.Close()
 
-	for _, r := range orbcore.MeanMotionStepped(orbdata.SunGrav, orb, time.Hour*24, 365) {
-		p := orbcore.OrbitToPosition(r, orbdata.SunGrav)
+	for _, r := range orbcore.MeanMotionStepped(orb, time.Hour*24, 365) {
+		p := orbcore.OrbitToPosition(r)
 		fmt.Fprintln(f, p)
 	}
 
