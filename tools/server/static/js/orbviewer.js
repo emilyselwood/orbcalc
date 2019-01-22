@@ -8,7 +8,7 @@ var scale = 1000000;
 var controls;
 var stats;
 var sprite;
-var raycaster
+var raycaster;
 var mouse;
 var sphere;
 var pointsSet = [];
@@ -51,7 +51,7 @@ function init() {
     
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x000005 );
-    
+    scene.fog = new THREE.Fog( 0x000005, 90000, 100000 );
     raycaster = new THREE.Raycaster();
     mouse = new THREE.Vector2();
 
@@ -95,10 +95,24 @@ function loadMajorPlanet(name, color) {
 
 function loadAsteroidBatch(batch) {
     
-    loadData("data/data-" + batch + ".csv", 
-    new THREE.PointsMaterial( { size: 1, vertexColors: THREE.VertexColors, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true} ),
-    new THREE.Color(0.9,0.9,1),
-    THREE.Points, true);
+    loadData(
+        "data/data-" + batch + ".csv",
+        new THREE.PointsMaterial( {
+            size: 6,
+            vertexColors: THREE.VertexColors,
+            map: sprite,
+            blending: THREE.AdditiveBlending,
+            depthTest: true,
+            transparent: true,
+            flatShading: true,
+            fog: false,
+            lights: false,
+            sizeAttenuation: false
+        } ),
+        new THREE.Color(0.9,0.9,1),
+        THREE.Points,
+        true
+    );
 }
 
 function createSun() {
