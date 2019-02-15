@@ -66,3 +66,14 @@ head, body{
     cursor: pointer;
     text-align: center;
 }
+
+#tourbutton{
+    position: fixed;
+    font-size: 14pt;
+    color: rgba(255, 255, 255, 0.75);
+    right: 30pt;
+    top: 0;
+    z-index: 4;
+    cursor: pointer;
+    text-align: center;
+}

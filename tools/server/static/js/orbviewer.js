@@ -13,6 +13,9 @@ var mouse;
 var sphere;
 var pointsSet = [];
 var dragFlag = 0;
+var controlState = 0;
+var tween;
+
 init();
 
 function init() {
@@ -52,7 +55,10 @@ function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x000005 );
     scene.fog = new THREE.Fog( 0x000005, 90000, 100000 );
+
     raycaster = new THREE.Raycaster();
+    raycaster.params.Points.threshold = 10;
+
     mouse = new THREE.Vector2();
 
     THREE.Cache.enabled = true;
@@ -77,7 +83,7 @@ function init() {
 
 
     // Create ray cast target sphere:
-    var sphereGeometry = new THREE.SphereBufferGeometry( 1, 120, 0 );
+    var sphereGeometry = new THREE.SphereBufferGeometry( 0.1, 12, 12 );
     var sphereMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
     sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
     scene.add( sphere );
@@ -94,7 +100,6 @@ function loadMajorPlanet(name, color) {
 }
 
 function loadAsteroidBatch(batch) {
-    
     loadData(
         "data/data-" + batch + ".csv",
         new THREE.PointsMaterial( {
@@ -177,19 +182,19 @@ function createGeom(data, color) {
     var lines = data.split(/\r?\n/);
     var n = lines.length;
     for (var i = 0; i < n; i++) {
-        if (lines[i] != "") {
-            parts = lines[i].split(",")
+        if (lines[i] !== "") {
+            parts = lines[i].split(",");
             var id = "";
             var x = 0.0;
             var y = 0.0;
             var z = 0.0;
 
-            if (parts.length == 4) {
+            if (parts.length === 4) {
                 id = parts[0];
                 x = parseFloat(parts[1]);
                 y = parseFloat(parts[2]);
                 z = parseFloat(parts[3]);
-            } else if (parts.length == 3) {
+            } else if (parts.length === 3) {
                 x = parseFloat(parts[0]);
                 y = parseFloat(parts[1]);
                 z = parseFloat(parts[2]);
@@ -207,7 +212,7 @@ function createGeom(data, color) {
                 z = z / scale;
                 positions.push( x, z, y ); // swap z and y around so we get more intuitve controls
                 colors.push( color.r, color.g, color.b );
-                if (id != "") {
+                if (id !== "") {
                     ids.push(id);
                 }
             }
@@ -227,8 +232,8 @@ function raycastCheck() {
 
         var objectID = intersection.object.userData.IDS[intersection.index];
         console.log("clicked on " + objectID );
-        var linkTag = document.getElementById("asteroidLink")
-        linkTag.innerText = objectID
+        var linkTag = document.getElementById("asteroidLink");
+        linkTag.innerText = objectID;
         linkTag.href = "https://www.minorplanetcenter.net/db_search/show_object?utf8=✓&object_id=" + objectID
         
     }
@@ -250,7 +255,7 @@ function onDocumentMouseMove( event ) {
 }
 
 function onCanvasClick(event) {
-    if (dragFlag == 0) {
+    if (dragFlag === 0) {
         raycastCheck();
     }  
     dragFlag = 0
@@ -266,7 +271,7 @@ function resize() {
     }
 }
 
-function animate() {
+function animate(time) {
     if (!renderer.domElement.parentElement) {
         return;
     }
@@ -276,15 +281,73 @@ function animate() {
     if (renderer.vr.isPresenting()) {
         renderer.vr.getCamera = renderer.vr._origGetCamera;
     } else {
-        controls.update();
+        if (controlState === 0) {
+            controls.update();
+        } else {
+            tween.update(time);
+        }
         renderer.vr.getCamera = () => camera;
+
     }
 
-    //raycastCheck();
     stats.update();
     render();
 }
 
 function render() {
     renderer.render( scene, camera );
+}
+
+function toggleTour() {
+    if (controlState === 0) {
+        controlState = 1;
+        setupMove();
+    } else {
+        controlState = 0;
+        tween.stop();
+        controls.update();
+    }
+
+}
+
+function setupMove() {
+    let targetPos = pickPosition();
+    var startPos = {
+        x: camera.position.x,
+        y: camera.position.y,
+        z: camera.position.z
+    };
+
+    console.log("moving from: " + startPos.x + "," + startPos.y + "," +startPos.z + " to: " + targetPos.x + "," + targetPos.y + "," +targetPos.z );
+
+    tween = new TWEEN.Tween(startPos)
+        .to(targetPos, 10000)
+        .easing(TWEEN.Easing.Quadratic.Out)
+        .onUpdate(function() {
+            camera.position.set(startPos.x, startPos.y, startPos.z);
+            controls.update();
+        })
+        .onComplete(setupMove)
+        .start();
+
+}
+
+function pickPosition() {
+    // pick a number between +-90 normal distribution
+    let lat = (randomNumber(45) + randomNumber(45)) - 90;
+
+    // pick a number between +-180 liner distribution
+    let lon = randomNumber(360) - 180;
+
+    // convert these two angles to a point on a sphere somewhere near the edge of the solar system.
+    const R = 1000;
+    return {
+        x: R * Math.cos(lat) * Math.cos(lon),
+        y: R * Math.cos(lat) * Math.sin(lon),
+        z: R * Math.sin(lat)
+    };
+}
+
+function randomNumber(max) {
+    return Math.floor(Math.random() * max)
 }

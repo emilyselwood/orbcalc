@@ -11,6 +11,7 @@
             <a id="asteroidLink" target="_blank"></a>
         </div>
         <div id="helpbutton" class="helpbutton" onclick="helpOn()">?</div>
+        <div id="tourbutton" class="tourbutton" onclick="toggleTour()">T</div>
         <div id="helpcontainer" class="overlay" onclick="helpOff()">
             <h1>Orb Viwer</h1>
             <p>
@@ -33,11 +34,13 @@
             <a onclick="helpOff()">Back</a>
 
         </div>
+
         
         <script src="https://cdn.jsdelivr.net/gh/brianpeiris/three.js@38eb15da0442eebf41ef4be6af1135440e7d547d/build/three.min.js"></script>
         <script src="js/OrbitControls.js"></script>
         <script src="https://cdn.jsdelivr.net/gh/brianpeiris/three.js@38eb15da0442eebf41ef4be6af1135440e7d547d/examples/js/libs/stats.min.js"></script>
         <script src="https://cdn.jsdelivr.net/gh/brianpeiris/three.js@38eb15da0442eebf41ef4be6af1135440e7d547d/examples/js/WebGL.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/16.3.5/Tween.min.js"></script>
         <script src="js/WebVR.js"></script>
         <script src="js/orbviewer.js"></script>
 		<script>
