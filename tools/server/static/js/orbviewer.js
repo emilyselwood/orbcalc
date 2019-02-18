@@ -108,8 +108,8 @@ function loadAsteroidBatch(batch) {
             map: sprite,
             blending: THREE.AdditiveBlending,
             depthTest: true,
-            transparent: true,
-            flatShading: true,
+            transparent: false,
+            alphaTest: 0.5,
             fog: false,
             lights: false,
             sizeAttenuation: false
