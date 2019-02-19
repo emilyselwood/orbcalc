@@ -46,15 +46,18 @@ function init() {
 
     camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 3, 100000 );
     camera.position.z = 60;
+
+
     window.addEventListener('vrdisplaypresentchange', () => {
         camera.position.z = 60;
     });
 
     controls = new THREE.OrbitControls( camera );
-    
+
     scene = new THREE.Scene();
     scene.background = new THREE.Color( 0x000005 );
     scene.fog = new THREE.Fog( 0x000005, 90000, 100000 );
+    camera.lookAt(scene.position);
 
     raycaster = new THREE.Raycaster();
     raycaster.params.Points.threshold = 10;
@@ -325,6 +328,7 @@ function setupMove() {
         .easing(TWEEN.Easing.Quadratic.Out)
         .onUpdate(function() {
             camera.position.set(startPos.x, startPos.y, startPos.z);
+            camera.lookAt(scene.position);
             controls.update();
         })
         .onComplete(setupMove)
