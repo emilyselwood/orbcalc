@@ -131,7 +131,7 @@ func stageRead(inputfile string, target int, skip int, output chan *orbcore.Orbi
 		}
 		result, err = mpcReader.ReadEntry()
 	}
-	if err != nil && err != io.EOF {
+	if err != io.EOF {
 		log.Fatal("error reading", err)
 	}
 

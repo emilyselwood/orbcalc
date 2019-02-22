@@ -15,6 +15,8 @@ var pointsSet = [];
 var dragFlag = 0;
 var controlState = 0;
 var tween;
+var orbitLine = null;
+var server = true;
 
 init();
 
@@ -66,10 +68,9 @@ function init() {
 
     THREE.Cache.enabled = true;
 
-    var loader = new THREE.TextureLoader();
-    sprite = loader.load( 'img/particle2.png' );
+    sprite = new THREE.TextureLoader().load( 'img/particle2.png' );
 
-    for (var i = 0; i < 16; i++) {
+    for (let i = 0; i < 16; i++) {
         loadAsteroidBatch(i);
     }
 
@@ -78,7 +79,7 @@ function init() {
         new THREE.Color(1,1,0), new THREE.Color(1,0,1), new THREE.Color(0,1,1),
         new THREE.Color(0,1,0), new THREE.Color(1,0,0)];
 
-    for (var i = 0; i < majorPlanets.length; i++) {
+    for (let i = 0; i < majorPlanets.length; i++) {
         loadMajorPlanet(majorPlanets[i], colours[i])
     }
 
@@ -86,9 +87,10 @@ function init() {
 
 
     // Create ray cast target sphere:
-    var sphereGeometry = new THREE.SphereBufferGeometry( 0.1, 12, 12 );
-    var sphereMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-    sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+    sphere = new THREE.Mesh(
+        new THREE.SphereBufferGeometry( 0.1, 12, 12 ),
+        new THREE.MeshBasicMaterial( { color: 0xff0000 } )
+    );
     scene.add( sphere );
 
     animate();
@@ -168,12 +170,12 @@ function loadData(name, mat, color, T, raytarget) {
 
         // onProgress callback
         function ( xhr ) {
-            console.log( name + ": " + (xhr.loaded / xhr.total * 100) + '% loaded ' );
+            //c onsole.log( name + ": " + (xhr.loaded / xhr.total * 100) + '% loaded ' );
         },
 
         // onError callback
         function ( err ) {
-            console.error( 'An error happened loading ' + name );
+            console.error( 'An error happened loading ' + name + ' ' + err);
         }
     );
 }
@@ -213,7 +215,7 @@ function createGeom(data, color) {
                 x = x / scale;
                 y = y / scale;
                 z = z / scale;
-                positions.push( x, z, y ); // swap z and y around so we get more intuitve controls
+                positions.push( x, z, y ); // swap z and y around so we get more intuitive controls
                 colors.push( color.r, color.g, color.b );
                 if (id !== "") {
                     ids.push(id);
@@ -227,7 +229,7 @@ function createGeom(data, color) {
 function raycastCheck() {
     raycaster.setFromCamera( mouse, camera );
     var intersections = raycaster.intersectObjects(pointsSet );
-    intersection = ( intersections.length ) > 0 ? intersections[ 0 ] : null;
+    var intersection = ( intersections.length ) > 0 ? intersections[ 0 ] : null;
     
     if ( intersection !== null) {
         sphere.position.copy( intersection.point );
@@ -237,8 +239,43 @@ function raycastCheck() {
         console.log("clicked on " + objectID );
         var linkTag = document.getElementById("asteroidLink");
         linkTag.innerText = objectID;
-        linkTag.href = "https://www.minorplanetcenter.net/db_search/show_object?utf8=✓&object_id=" + objectID
-        
+        linkTag.href = "https://www.minorplanetcenter.net/db_search/show_object?utf8=✓&object_id=" + objectID;
+        if (server) {
+            var loader = new THREE.FileLoader();
+            loader.load("/obj/" + objectID.replace(/ /g, '+'),
+                function (data) {
+                    if (orbitLine !== null) {
+                        scene.remove(orbitLine)
+                    }
+
+                    const response = JSON.parse(data);
+
+                    let positions = [];
+                    let colors = [];
+                    for (let i = 0; i < response.Orbit.length; i++) {
+                        positions.push(response.Orbit[i].X / scale, response.Orbit[i].Z / scale, response.Orbit[i].Y / scale);
+                        colors.push(0, 0, 255);
+                    }
+                    const geometry = new THREE.BufferGeometry();
+                    geometry.addAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+                    geometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+                    geometry.computeBoundingSphere();
+
+                    orbitLine = new THREE.Line(geometry, new THREE.LineBasicMaterial({color: 0xFF0000, linewidth: 10}));
+                    scene.add(orbitLine);
+                    console.log("loaded " + objectID);
+                },
+                function(xhr) {
+
+                },
+                function(error) {
+                    // If we cant talk to the server for some reason we won't try again.
+                    // It is likely we are running in a static environment.
+                    server = false;
+                }
+
+            )
+        }
     }
 }
 
@@ -257,7 +294,7 @@ function onDocumentMouseMove( event ) {
     dragFlag = 1;                
 }
 
-function onCanvasClick(event) {
+function onCanvasClick() {
     if (dragFlag === 0) {
         raycastCheck();
     }  

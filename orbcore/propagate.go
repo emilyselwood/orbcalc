@@ -43,7 +43,15 @@ func MeanMotionFullOrbit(orbit *Orbit, count int64) []*Orbit {
 }
 
 /*
-MeanMotion uses the mean motion method to propgate [orbit] through [t] seconds .
+MeanMotionToDate calculates the mean motion value for a defined date.
+*/
+func MeanMotionToDate(orbit *Orbit, d time.Time) *Orbit {
+	duration := orbit.Epoch.Sub(d)
+	return MeanMotion(orbit, duration)
+}
+
+/*
+MeanMotion uses the mean motion method to propagate [orbit] through [t] seconds .
 */
 func MeanMotion(orbit *Orbit, t time.Duration) *Orbit {
 	p := orbit.SemimajorAxis * (1 - math.Pow(orbit.OrbitalEccentricity, 2))
