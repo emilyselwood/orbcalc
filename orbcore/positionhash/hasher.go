@@ -21,25 +21,28 @@ tree across four dimensions.
 
 The idea here is like a geohash but across more dimensions so we can define a box of space and time and easily match
 positions that are in the box or not.
+
+An instance of HexHasher is not thread safe.
  */
 type HexHasher struct {
 	Space *orbcore.BoundingBox
 	Depth int
+	boxBuffer [16]orbcore.BoundingBox
 }
 
 func (hh *HexHasher) Hash(pos *orbcore.Position) (string, error) {
-	builder, err := hh.generateHexHash(pos, hh.Space, &strings.Builder{})
+	builder, err := hh.generateHexHash(pos, *(hh.Space), &strings.Builder{})
 	if err != nil {
 		return "", err
 	}
 	return builder.String(), nil
 }
 
-func (hh *HexHasher) Box(hash string) (*orbcore.BoundingBox, error) {
-	return hh.findBox(hash, hh.Space)
+func (hh *HexHasher) Box(hash string) (orbcore.BoundingBox, error) {
+	return hh.findBox(hash, *(hh.Space))
 }
 
-func (hh *HexHasher) generateHexHash(pos *orbcore.Position, box *orbcore.BoundingBox, result *strings.Builder) (*strings.Builder, error) {
+func (hh *HexHasher) generateHexHash(pos *orbcore.Position, box orbcore.BoundingBox, result *strings.Builder) (*strings.Builder, error) {
 	if !box.Contains(pos) {
 		return result, fmt.Errorf("position is not valid for this hasher")
 	}
@@ -49,7 +52,7 @@ func (hh *HexHasher) generateHexHash(pos *orbcore.Position, box *orbcore.Boundin
 	}
 
 	const values string = "0123456789ABCDEF"
-	splits := splitBox(box)
+	splits := splitBox(box, hh.boxBuffer)
 	for i, b := range splits {
 		if b.Contains(pos) {
 			result.WriteRune(rune(values[i]))
@@ -59,7 +62,7 @@ func (hh *HexHasher) generateHexHash(pos *orbcore.Position, box *orbcore.Boundin
 	return result, fmt.Errorf("could not find sub bounding box to select from %v for point %v", box, pos)
 }
 
-func (hh *HexHasher) findBox(hash string, parent *orbcore.BoundingBox) (*orbcore.BoundingBox, error) {
+func (hh *HexHasher) findBox(hash string, parent orbcore.BoundingBox) (orbcore.BoundingBox, error) {
 	if hash == "" {
 		return parent, nil
 	}
@@ -68,7 +71,7 @@ func (hh *HexHasher) findBox(hash string, parent *orbcore.BoundingBox) (*orbcore
 	if index < 0 || index >= 16 {
 		return parent, fmt.Errorf("unknown character in hash, 0-9A-F are valid")
 	}
-	splits := splitBox(parent)
+	splits := splitBox(parent, hh.boxBuffer)
 
 	return hh.findBox(hash[1:], splits[index])
 }
@@ -76,7 +79,7 @@ func (hh *HexHasher) findBox(hash string, parent *orbcore.BoundingBox) (*orbcore
 /*
 splitBox cuts a bounding box in two along all of its dimensions
 */
-func splitBox(box *orbcore.BoundingBox) [16]*orbcore.BoundingBox {
+func splitBox(box orbcore.BoundingBox, result [16]orbcore.BoundingBox) [16]orbcore.BoundingBox {
 
 	minX, midX, maxX := splitFloat64(box.MinX, box.MaxX)
 	minY, midY, maxY := splitFloat64(box.MinY, box.MaxY)
@@ -85,9 +88,7 @@ func splitBox(box *orbcore.BoundingBox) [16]*orbcore.BoundingBox {
 
 	// We need to have each combination of min and max boxes for the four dimensions.
 	// use the binary encoding of an int to achieve this.
-	var result [16]*orbcore.BoundingBox
 	for i := 0; i < 16; i++ {
-		result[i] = &orbcore.BoundingBox{}
 		result[i].MinX, result[i].MaxX = pickSide(i&0x1, minX, midX, maxX)
 		result[i].MinY, result[i].MaxY = pickSide(i&0x2, minY, midY, maxY)
 		result[i].MinZ, result[i].MaxZ = pickSide(i&0x4, minZ, midZ, maxZ)
