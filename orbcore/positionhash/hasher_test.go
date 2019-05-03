@@ -74,3 +74,42 @@ func TestHexHasher_Hash(t *testing.T) {
 		t.Fatalf("expected 8FF7FF got '%v'", result)
 	}
 }
+
+
+func TestHexHasher_Box(t *testing.T) {
+	hasher := HexHasher{
+		Space: &orbcore.BoundingBox{
+			MinX: -10, MaxX: 10,
+			MinY: -10, MaxY: 10,
+			MinZ: -10, MaxZ: 10,
+			MinTime: time.Date(2010, 1, 1, 0, 0, 0, 0, time.UTC),
+			MaxTime: time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
+		},
+		Depth: 6,
+	}
+
+	box, err := hasher.Box("8FF7FF")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if box == nil {
+		t.Fatal("Expected a response didn't get one")
+	}
+
+	expected := orbcore.BoundingBox{
+		MinX : -0.3125,
+		MinY : -0.3125,
+		MinZ : -0.3125,
+		MinTime: time.Date(2019, 3, 21, 16, 30, 0, 0, time.UTC),
+		MaxX : 0,
+		MaxY : 0,
+		MaxZ : 0,
+		MaxTime: time.Date(2019, 5, 17, 18, 0, 0, 0, time.UTC),
+	}
+
+	if expected != *box {
+		t.Fatalf("expected %v got %v", expected, *box)
+	}
+
+
+}

@@ -36,7 +36,7 @@ func (hh *HexHasher) Hash(pos *orbcore.Position) (string, error) {
 }
 
 func (hh *HexHasher) Box(hash string) (*orbcore.BoundingBox, error) {
-	return nil, nil
+	return hh.findBox(hash, hh.Space)
 }
 
 func (hh *HexHasher) generateHexHash(pos *orbcore.Position, box *orbcore.BoundingBox, result *strings.Builder) (*strings.Builder, error) {
@@ -57,6 +57,20 @@ func (hh *HexHasher) generateHexHash(pos *orbcore.Position, box *orbcore.Boundin
 		}
 	}
 	return result, fmt.Errorf("could not find sub bounding box to select from %v for point %v", box, pos)
+}
+
+func (hh *HexHasher) findBox(hash string, parent *orbcore.BoundingBox) (*orbcore.BoundingBox, error) {
+	if hash == "" {
+		return parent, nil
+	}
+
+	index := int(hexToDec(hash[0]))
+	if index < 0 || index >= 16 {
+		return parent, fmt.Errorf("unknown character in hash, 0-9A-F are valid")
+	}
+	splits := splitBox(parent)
+
+	return hh.findBox(hash[1:], splits[index])
 }
 
 /*
@@ -107,4 +121,12 @@ func splitFloat64(min, max float64) (float64, float64, float64) {
 
 func splitTime(min, max time.Time) (time.Time, time.Time, time.Time) {
 	return min, min.Add(time.Duration(int64(max.Sub(min)) / 2)), max
+}
+
+func hexToDec(c uint8) uint8 {
+	if c >= '0' && c <= '9' {
+		return c - '0'
+	} else {
+		return (c - 'A') + 10
+	}
 }
