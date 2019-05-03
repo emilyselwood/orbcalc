@@ -14,6 +14,11 @@ head, body{
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif
 }
 
+#container {
+    width: 100%;
+    height: 100%
+}
+
 #clickLabel {
     width:100%;
     position: fixed;

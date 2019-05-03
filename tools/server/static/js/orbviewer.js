@@ -2,21 +2,21 @@ if ( WEBGL.isWebGLAvailable() === false ) {
     document.body.appendChild( WEBGL.getWebGLErrorMessage() );
 }
 
-var container;
-var camera, scene, renderer;
-var scale = 1000000;
-var controls;
-var stats;
-var sprite;
-var raycaster;
-var mouse;
-var sphere;
-var pointsSet = [];
-var dragFlag = 0;
-var controlState = 0;
-var tween;
-var orbitLine = null;
-var server = true;
+let container;
+let camera, scene, renderer;
+const scale = 1000000;
+let controls;
+let stats;
+let sprite;
+let raycaster;
+let mouse;
+let sphere;
+let pointsSet = [];
+let dragFlag = 0;
+let controlState = 0;
+let tween;
+let orbitLine = null;
+let server = true;
 
 init();
 
@@ -41,14 +41,13 @@ function init() {
     stats = new Stats();
     container.appendChild( stats.dom );
 
-    var vrButton = WEBVR.createButton(renderer);
+    let vrButton = WEBVR.createButton(renderer);
     if (vrButton) {
         document.body.appendChild(vrButton);
     }
 
     camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 3, 100000 );
     camera.position.z = 60;
-
 
     window.addEventListener('vrdisplaypresentchange', () => {
         camera.position.z = 60;
@@ -74,8 +73,8 @@ function init() {
         loadAsteroidBatch(i);
     }
 
-    var majorPlanets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"];
-    var colours = [new THREE.Color(1,0,0), new THREE.Color(0,1,0), new THREE.Color(0,0,1),
+    const majorPlanets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"];
+    const colours = [new THREE.Color(1,0,0), new THREE.Color(0,1,0), new THREE.Color(0,0,1),
         new THREE.Color(1,1,0), new THREE.Color(1,0,1), new THREE.Color(0,1,1),
         new THREE.Color(0,1,0), new THREE.Color(1,0,0)];
 
@@ -126,20 +125,20 @@ function loadAsteroidBatch(batch) {
 }
 
 function createSun() {
-    var positions = [0, 0, 0];
-    var colors = [1,1,0];
+    const positions = [0, 0, 0];
+    const colors = [1,1,0];
 
-    var geometry = new THREE.BufferGeometry();
+    const geometry = new THREE.BufferGeometry();
     geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
     geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
     geometry.computeBoundingSphere();
     
-    var points = new THREE.Points( geometry, new THREE.PointsMaterial( { size: 10, vertexColors: THREE.VertexColors, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } ));
+    const points = new THREE.Points( geometry, new THREE.PointsMaterial( { size: 10, vertexColors: THREE.VertexColors, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } ));
     scene.add( points );
 }
 
 function loadData(name, mat, color, T, raytarget) {
-    var loader = new THREE.FileLoader();
+    let loader = new THREE.FileLoader();
     
     //load a text file and output the result to the console
     loader.load(
@@ -147,17 +146,17 @@ function loadData(name, mat, color, T, raytarget) {
         name,
         // onLoad callback
         function ( data ) {
-            var bits = createGeom(data, color);
-            var positions = bits[0];
-            var colors = bits[1];
-            var ids = bits[2];
+            const bits = createGeom(data, color);
+            const positions = bits[0];
+            const colors = bits[1];
+            const ids = bits[2];
 
-            var geometry = new THREE.BufferGeometry();
+            const geometry = new THREE.BufferGeometry();
             geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
             geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
             geometry.computeBoundingSphere();
 
-            var points = new T( geometry, mat);
+            const points = new T( geometry, mat);
             if (ids.length > 0) {
                 points.userData = {IDS: ids};
             }
@@ -181,18 +180,18 @@ function loadData(name, mat, color, T, raytarget) {
 }
 
 function createGeom(data, color) {
-    var positions = [];
-    var colors = [];
-    var ids = [];
-    var lines = data.split(/\r?\n/);
-    var n = lines.length;
-    for (var i = 0; i < n; i++) {
+    let positions = [];
+    let colors = [];
+    let ids = [];
+    const lines = data.split(/\r?\n/);
+    const n = lines.length;
+    for (let i = 0; i < n; i++) {
         if (lines[i] !== "") {
-            parts = lines[i].split(",");
-            var id = "";
-            var x = 0.0;
-            var y = 0.0;
-            var z = 0.0;
+            let parts = lines[i].split(",");
+            let id = "";
+            let x = 0.0;
+            let y = 0.0;
+            let z = 0.0;
 
             if (parts.length === 4) {
                 id = parts[0];
@@ -228,20 +227,20 @@ function createGeom(data, color) {
 
 function raycastCheck() {
     raycaster.setFromCamera( mouse, camera );
-    var intersections = raycaster.intersectObjects(pointsSet );
-    var intersection = ( intersections.length ) > 0 ? intersections[ 0 ] : null;
+    const intersections = raycaster.intersectObjects(pointsSet );
+    const intersection = ( intersections.length ) > 0 ? intersections[ 0 ] : null;
     
     if ( intersection !== null) {
         sphere.position.copy( intersection.point );
         sphere.scale.set( 1, 1, 1 );
 
-        var objectID = intersection.object.userData.IDS[intersection.index];
+        const objectID = intersection.object.userData.IDS[intersection.index];
         console.log("clicked on " + objectID );
-        var linkTag = document.getElementById("asteroidLink");
+        const linkTag = document.getElementById("asteroidLink");
         linkTag.innerText = objectID;
         linkTag.href = "https://www.minorplanetcenter.net/db_search/show_object?utf8=✓&object_id=" + objectID;
         if (server) {
-            var loader = new THREE.FileLoader();
+            const loader = new THREE.FileLoader();
             loader.load("/obj/" + objectID.replace(/ /g, '+'),
                 function (data) {
                     if (orbitLine !== null) {
@@ -256,12 +255,16 @@ function raycastCheck() {
                         positions.push(response.Orbit[i].X / scale, response.Orbit[i].Z / scale, response.Orbit[i].Y / scale);
                         colors.push(0, 0, 255);
                     }
+
+                    positions.push(positions[0], positions[1], positions[2]);
+                    colors.push(0, 0, 255);
+
                     const geometry = new THREE.BufferGeometry();
                     geometry.addAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
                     geometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
                     geometry.computeBoundingSphere();
 
-                    orbitLine = new THREE.Line(geometry, new THREE.LineBasicMaterial({color: 0xFF0000, linewidth: 10}));
+                    orbitLine = new THREE.Line(geometry, new THREE.LineBasicMaterial({color: 0x77FF77, linewidth: 10}));
                     scene.add(orbitLine);
                     console.log("loaded " + objectID);
                 },
@@ -303,8 +306,8 @@ function onCanvasClick() {
 
 function resize() {
     if (needsResize(container)) {
-        var w = container.clientWidth;
-        var h = container.clientHeight;
+        const w = container.clientWidth;
+        const h = container.clientHeight;
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
         renderer.setSize(w, h, false);
@@ -352,7 +355,7 @@ function toggleTour() {
 
 function setupMove() {
     let targetPos = pickPosition();
-    var startPos = {
+    let startPos = {
         x: camera.position.x,
         y: camera.position.y,
         z: camera.position.z
