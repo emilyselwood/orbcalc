@@ -38,7 +38,7 @@ MeanMotionFullOrbit will calculate a number of entries for a full orbit, divided
 */
 func MeanMotionFullOrbit(orbit *Orbit, count int64) []*Orbit {
 	orbitalPeriod := OrbitalPeriod(orbit)
-	step := orbitalPeriod / time.Duration(count)
+	step := time.Duration(int64(orbitalPeriod) / count)
 	return MeanMotionStepped(orbit, step, count)
 }
 
