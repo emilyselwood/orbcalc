@@ -24,7 +24,7 @@ tree across four dimensions.
 The idea here is like a geohash but across more dimensions so we can define a box of space and time and easily match
 positions that are in the box or not.
 
-An instance of HexHasher is not thread safe.
+An instance of HexHasher is *not* thread safe.
 */
 type HexHasher struct {
 	Space     *orbcore.BoundingBox
@@ -94,6 +94,7 @@ func splitBox(box orbcore.BoundingBox, result [16]orbcore.BoundingBox) [16]orbco
 
 	// unrolled array population to avoid branching at all.
 	// yes this is ugly but it is damn quick
+	// it replaces a loop that used a bit of an int to control which side of each field was used.
 	result[0].MinX, result[0].MaxX = minX, midX
 	result[0].MinY, result[0].MaxY = minY, midY
 	result[0].MinZ, result[0].MaxZ = minZ, midZ
@@ -175,14 +176,6 @@ func splitBox(box orbcore.BoundingBox, result [16]orbcore.BoundingBox) [16]orbco
 	result[15].MinTime, result[15].MaxTime = midTime, maxTime
 
 	return result
-}
-
-func pickSide(side int, min, mid, max float64) (float64, float64) {
-	if side == 0 {
-		return min, mid
-	} else {
-		return mid, max
-	}
 }
 
 /*
