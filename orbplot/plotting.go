@@ -72,7 +72,7 @@ func PlotPoints(p *plot.Plot, orb []*orbcore.Orbit, c []color.RGBA, legend bool)
 	for i, d := range orb {
 		result[i] = orbcore.OrbitToPosition(d)
 	}
-	
+
 	scatter, err := plotter.NewScatter(PositionToPointsXY(result))
 	if err != nil {
 		return err
@@ -83,7 +83,7 @@ func PlotPoints(p *plot.Plot, orb []*orbcore.Orbit, c []color.RGBA, legend bool)
 
 		result.Color = c[i]
 		return result
-	}                                          
+	}
 
 	p.Add(scatter)
 

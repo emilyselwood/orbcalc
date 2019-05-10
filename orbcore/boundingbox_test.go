@@ -21,7 +21,7 @@ func TestBoundingBox_Contains(t *testing.T) {
 		MaxTime: time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
 	}
 
-	points := []struct {
+	cases := []struct {
 		pos    Position
 		box    BoundingBox
 		inside bool
@@ -83,12 +83,51 @@ func TestBoundingBox_Contains(t *testing.T) {
 		},
 	}
 
-	for _, p := range points {
-		t.Run("BoundingBox_Contains "+p.pos.ID, func(t2 *testing.T) {
-			if p.box.Contains(&p.pos) != p.inside {
-				t2.Fatalf("Expected %v to be inside %v but it wasn't", p.pos, p.box)
+	for _, c := range cases {
+		t.Run("BoundingBox_Contains "+c.pos.ID, func(t2 *testing.T) {
+			if c.box.Contains(&c.pos) != c.inside {
+				t2.Fatalf("Expected %v to be inside %v but it wasn't", c.pos, c.box)
 			}
 		})
 	}
 
+}
+
+func TestPositionsToBoundingBox(t *testing.T) {
+	expected := BoundingBox{
+		MinX: -10, MaxX: 10,
+		MinY: -10, MaxY: 10,
+		MinZ: -10, MaxZ: 10,
+		MinTime: time.Date(2010, 1, 1, 0, 0, 0, 0, time.UTC),
+		MaxTime: time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
+	}
+
+	input := []*Position{
+		{
+			ID:    "first",
+			Epoch: time.Date(2010, 1, 1, 0, 0, 0, 0, time.UTC),
+			X:     0,
+			Y:     0,
+			Z:     0,
+		},
+		{
+			ID:    "second",
+			Epoch: time.Date(2019, 5, 3, 13, 37, 12, 0, time.UTC),
+			X:     10,
+			Y:     10,
+			Z:     10,
+		},
+		{
+			ID:    "third",
+			Epoch: time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC),
+			X:     -10,
+			Y:     -10,
+			Z:     -10,
+		},
+	}
+
+	result := PositionsToBoundingBox(input)
+	if expected != *result {
+		t.Fatalf("Expected %v got %v", expected, *result)
+	}
 }

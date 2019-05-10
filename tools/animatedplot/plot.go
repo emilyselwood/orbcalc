@@ -1,9 +1,9 @@
 package main
 
 import (
-	"gonum.org/v1/plot/vg/draw"
 	"flag"
 	"fmt"
+	"gonum.org/v1/plot/vg/draw"
 	"io"
 	"log"
 	"os"

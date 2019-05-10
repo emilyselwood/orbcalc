@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -24,77 +23,6 @@ type Position struct {
 
 func (p *Position) String() string {
 	return fmt.Sprintf("%v,%v,%v,%v,%v", p.ID, p.Epoch.Format(time.RFC3339), p.X, p.Y, p.Z)
-}
-
-/*
-BoundingBox defines a four dimensional bounding box in space and time.
-*/
-type BoundingBox struct {
-	MinX    float64
-	MinY    float64
-	MinZ    float64
-	MinTime time.Time
-	MaxX    float64
-	MaxY    float64
-	MaxZ    float64
-	MaxTime time.Time
-}
-
-func (bb *BoundingBox) String() string {
-	return fmt.Sprintf(
-		"(%v,%v,%v,%v)x(%v,%v,%v,%v)",
-		bb.MinX, bb.MinY, bb.MinZ, bb.MinTime,
-		bb.MaxX, bb.MaxY, bb.MaxZ, bb.MaxTime,
-	)
-}
-
-/*
-Contains returns true if the provided position is inside the box.
-*/
-func (bb *BoundingBox) Contains(pos *Position) bool {
-	return bb.MinX <= pos.X && pos.X <= bb.MaxX &&
-		bb.MinY <= pos.Y && pos.Y <= bb.MaxY &&
-		bb.MinZ <= pos.Z && pos.Z <= bb.MaxZ &&
-		(bb.MinTime.Before(pos.Epoch) || bb.MinTime.Equal(pos.Epoch)) &&
-		(pos.Epoch.Before(bb.MaxTime) || pos.Epoch.Equal(bb.MaxTime))
-}
-
-/*
-PositionsToBoundingBox creates a bounding box around a set of positions.
- */
-func PositionsToBoundingBox(positions []*Position) *BoundingBox {
-
-	minX, minY, minZ := math.MaxFloat64, math.MaxFloat64, math.MaxFloat64
-	maxX, maxY, maxZ := -math.MaxFloat64, -math.MaxFloat64, -math.MaxFloat64
-
-	minTime := time.Unix(1<<63-62135596801, 999999999)
-	maxTime := time.Time{}
-
-	for _, p := range positions {
-
-		minX = math.Min(minX, p.X)
-		minY = math.Min(minY, p.Y)
-		minZ = math.Min(minZ, p.Z)
-
-		maxX = math.Max(maxX, p.X)
-		maxY = math.Max(maxY, p.Y)
-		maxZ = math.Max(maxZ, p.Z)
-
-		if p.Epoch.Before(minTime) {
-			minTime = p.Epoch
-		}
-
-		if p.Epoch.After(maxTime) {
-			maxTime = p.Epoch
-		}
-	}
-
-	return &BoundingBox{
-		MinX: minX, MaxX: maxX,
-		MinY: minY, MaxY: maxY,
-		MinZ: minZ, MaxZ: maxZ,
-		MinTime: minTime, MaxTime:maxTime,
-	}
 }
 
 /*
