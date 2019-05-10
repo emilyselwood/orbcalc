@@ -71,7 +71,6 @@ func main() {
 	http.HandleFunc("/obj/", logWrapper(lookupAsteroid))
 	http.HandleFunc("/", logWrapper(fs.ServeHTTP))
 
-
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }
 

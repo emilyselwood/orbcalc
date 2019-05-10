@@ -49,7 +49,7 @@ func TestQuickerRotationMatrixForOrbit(t *testing.T) {
 
 func TestTestQuickerRotationMatrixForOrbitLong(t *testing.T) {
 	point := []float64{5e+10, 5e+10, 10}
-	for i := 0.0; i < 180.0; i = i+0.10101{
+	for i := 0.0; i < 180.0; i = i + 0.10101 {
 		t.Run(fmt.Sprintf("deg:%v", i), func(t2 *testing.T) {
 			angle := float64(i) * math.Pi / 180.0
 

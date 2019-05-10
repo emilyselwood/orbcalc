@@ -9,6 +9,8 @@ import (
 
 /*
 Hasher defines a way to create spacial temporal hashes.
+
+Inspired by geohash, this extends to 4 dimensions.
 */
 type Hasher interface {
 	Hash(pos *orbcore.Position) (string, error)
@@ -23,10 +25,10 @@ The idea here is like a geohash but across more dimensions so we can define a bo
 positions that are in the box or not.
 
 An instance of HexHasher is not thread safe.
- */
+*/
 type HexHasher struct {
-	Space *orbcore.BoundingBox
-	Depth int
+	Space     *orbcore.BoundingBox
+	Depth     int
 	boxBuffer [16]orbcore.BoundingBox
 }
 
