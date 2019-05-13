@@ -75,21 +75,11 @@ func OrbitToVector(orbit *Orbit) (mat.Vector, mat.Vector) {
 
 	r, v := OrbitToVecPerifocal(orbit)
 
-
-	//TODO: Fix this and put it back in some day.
 	rot := QuickerRotationMatrixForOrbit(orbit.LongitudeOfTheAscendingNode, orbit.InclinationToTheEcliptic, orbit.ArgumentOfPerihelion)
 
 	r.MulVec(rot, r)
 	v.MulVec(rot, v)
-	/*
-	r = Rotate(r, orbit.ArgumentOfPerihelion, AxisZ)
-	r = Rotate(r, orbit.InclinationToTheEcliptic, AxisX)
-	r = Rotate(r, orbit.LongitudeOfTheAscendingNode, AxisZ)
 
-	v = Rotate(v, orbit.ArgumentOfPerihelion, AxisZ)
-	v = Rotate(v, orbit.InclinationToTheEcliptic, AxisX)
-	v = Rotate(v, orbit.LongitudeOfTheAscendingNode, AxisZ)
-*/
 	return r, v
 }
 
