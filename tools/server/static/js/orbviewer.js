@@ -18,9 +18,72 @@ let tween;
 let orbitLine = null;
 let server = true;
 
+// size of the solar system
+// TODO: pull this from somewhere and make the server generate it.
+const minX = -1.0993153024260256e+10 / scale;
+const maxX = 1.1259105381765476e+10 / scale;
+const minY = -8.336972753734525e+09 / scale;
+const maxY = 1.1216725295000006e+10 / scale;
+const minZ = -5.482463379824468e+09 / scale;
+const maxZ = 4.381383003697839e+09 / scale;
+
+// color pallets for pride flags.
+const Rainbow = [
+    [231 / 255, 0, 0],
+    [255 / 255, 140 / 255, 0],
+    [255 / 255, 239 / 255, 0],
+    [0, 129 / 255, 31 / 255],
+    [0, 68 / 255, 255 / 255]
+];
+
+const Trans = [
+    [85 / 255, 205 / 255, 252 / 255],
+    [247 / 255, 168 / 255, 184 / 255],
+    [255 / 255, 255 / 255, 255 / 255],
+    [247 / 255, 168 / 255, 184 / 255],
+    [85 / 255, 205 / 255, 252 / 255]
+];
+
+// TODO: check that this is correct
+const Bi = [
+    [217 / 255, 0, 111 / 255],
+    [217 / 255, 0, 111 / 255],
+    [116 / 255, 77 / 255, 152 / 255],
+    [0, 51 / 255, 171 / 255],
+    [0, 51 / 255, 171 / 255]
+];
+
+// TODO: Lesbian
+// TODO: Pan
+
+// basic color pallet for asteroids.
+const White = [[1, 1, 1]];
+
+const colourmaps = [
+    Rainbow,
+    Trans,
+    Bi,
+    White
+];
+// pick a random colour map for the asteroids
+let colourMap = null;
+
 init();
 
 function init() {
+
+    // pick a colour pallet for the asteroids.
+    const url = new URL(window.location.href);
+    if (url.searchParams.has('f')) {
+        const f = parseInt(url.searchParams.get('f'), 10);
+        if(!Number.isNaN(f) && f >= 0 && f < colourmaps.length) {
+            colourMap = colourmaps[f];
+        }
+    }
+    if (colourMap === null) {
+        colourMap = colourmaps[Math.floor(Math.random() * colourmaps.length)];
+    }
+
     document.addEventListener( 'mousemove', onDocumentMouseMove, false );
     container = document.getElementById( 'container' );
     container.addEventListener('click', onCanvasClick, false);
@@ -74,8 +137,8 @@ function init() {
     }
 
     const majorPlanets = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"];
-    const colours = [new THREE.Color(1,0,0), new THREE.Color(0,1,0), new THREE.Color(0,0,1),
-        new THREE.Color(1,1,0), new THREE.Color(1,0,1), new THREE.Color(0,1,1),
+    const colours = [new THREE.Color(1,1,0), new THREE.Color(0,1,0), new THREE.Color(0,0,1),
+        new THREE.Color(1,0,0), new THREE.Color(1,0,1), new THREE.Color(0,1,1),
         new THREE.Color(0,1,0), new THREE.Color(1,0,0)];
 
     for (let i = 0; i < majorPlanets.length; i++) {
@@ -83,7 +146,6 @@ function init() {
     }
 
     createSun();
-
 
     // Create ray cast target sphere:
     sphere = new THREE.Mesh(
@@ -118,7 +180,7 @@ function loadAsteroidBatch(batch) {
             lights: false,
             sizeAttenuation: false
         } ),
-        new THREE.Color(0.9,0.9,1),
+        colourMap,
         THREE.Points,
         true
     );
@@ -209,17 +271,23 @@ function createGeom(data, color) {
             
             if (isNaN(x) || isNaN(y) || isNaN(z)) {
                 console.log("could not decode " + lines[i] + " line " + i);
-            } else {
-
-                x = x / scale;
-                y = y / scale;
-                z = z / scale;
-                positions.push( x, z, y ); // swap z and y around so we get more intuitive controls
-                colors.push( color.r, color.g, color.b );
-                if (id !== "") {
-                    ids.push(id);
-                }
+                continue;
             }
+
+            x = x / scale;
+            y = y / scale;
+            z = z / scale;
+            positions.push( x, z, y ); // swap z and y around so we get more intuitive controls
+            if (Array.isArray(color)) { // if our color is an array we probably need to pick one of the entries.
+                let c = mapToColour(color, x, y, z);
+                colors.push(c[0], c[1], c[2]);
+            } else { // otherwise it should be a three.Color object.
+                colors.push(color.r, color.g, color.b);
+            }
+            if (id !== "") {
+                ids.push(id);
+            }
+
         }
     }
     return [positions, colors, ids];
@@ -276,7 +344,6 @@ function raycastCheck() {
                     // It is likely we are running in a static environment.
                     server = false;
                 }
-
             )
         }
     }
@@ -330,7 +397,6 @@ function animate(time) {
             tween.update(time);
         }
         renderer.vr.getCamera = () => camera;
-
     }
 
     stats.update();
@@ -394,4 +460,13 @@ function pickPosition() {
 
 function randomNumber(max) {
     return Math.floor(Math.random() * max)
+}
+
+function mapToColour(map, x, y, z) {
+    let bucket = Math.round(((x - minX) / (maxX - minX)) * (map.length-1));
+    if (bucket < 0 || bucket >= map.length) {
+        console.log("could not find bucket for x: " + x + " got bucket " + bucket);
+        return map[0]
+    }
+    return map[bucket];
 }
