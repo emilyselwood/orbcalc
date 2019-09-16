@@ -1,6 +1,6 @@
 package orbdata
 
-import "github.com/wselwood/orbcalc/orbcore"
+import "github.com/emilyselwood/orbcalc/orbcore"
 
 /*
 SolarSystemBox defines a bounding box containing the solar system.

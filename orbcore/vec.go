@@ -130,12 +130,3 @@ func RotationMatrix(angle float64, axis Axis) *mat.Dense {
 	}
 
 }
-
-/*
-Identity creates an identity matrix (square, with ones on the diag)
-*/
-func Identity(size int) *mat.DiagDense {
-	m := mat.NewDiagonal(size, nil)
-
-	return m
-}

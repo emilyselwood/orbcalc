@@ -6,7 +6,7 @@ import (
 	"log"
 	"math"
 
-	"github.com/wselwood/orbcalc/orbcore"
+	"github.com/emilyselwood/orbcalc/orbcore"
 )
 
 func main() {

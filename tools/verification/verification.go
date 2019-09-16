@@ -15,8 +15,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wselwood/orbcalc/orbcore"
-	"github.com/wselwood/orbcalc/orbdata"
+	"github.com/emilyselwood/orbcalc/orbcore"
+	"github.com/emilyselwood/orbcalc/orbdata"
 )
 
 var testObjects = []*orbcore.Orbit{

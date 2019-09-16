@@ -61,5 +61,5 @@ This project owes a great debt of thanks to the [poliastro project](https://gith
 
 The following people have helped improve this project:
 
-* [Wil Selwood](https://github.com/wselwood)
+* [Emily Selwood](https://github.com/emilyselwood)
 * [Brian Peiris](https://github.com/brianpeiris) [Fixing the vr mode](https://github.com/wselwood/orbviewer/pull/1) in [OrbViewer](https://parsecsreach.com/orbviewer)

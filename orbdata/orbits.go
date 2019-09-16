@@ -1,7 +1,7 @@
 package orbdata
 
 import (
-	"github.com/wselwood/orbcalc/orbcore"
+	"github.com/emilyselwood/orbcalc/orbcore"
 )
 
 // This file will contain orbital information for standard objects. Major planets, moons and so on.

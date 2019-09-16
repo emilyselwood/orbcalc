@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/wselwood/orbcalc/orbplot"
+	"github.com/emilyselwood/orbcalc/orbplot"
 	"gonum.org/v1/plot"
 )
 

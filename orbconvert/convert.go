@@ -3,9 +3,9 @@ package orbconvert
 import (
 	"math"
 
-	"github.com/wselwood/gompcreader"
-	"github.com/wselwood/orbcalc/orbcore"
-	"github.com/wselwood/orbcalc/orbdata"
+	"github.com/emilyselwood/gompcreader"
+	"github.com/emilyselwood/orbcalc/orbcore"
+	"github.com/emilyselwood/orbcalc/orbdata"
 )
 
 /*

@@ -1,7 +1,7 @@
 package positionhash
 
 import (
-	"github.com/wselwood/orbcalc/orbcore"
+	"github.com/emilyselwood/orbcalc/orbcore"
 	"testing"
 	"time"
 )

@@ -2,7 +2,7 @@ package positionhash
 
 import (
 	"fmt"
-	"github.com/wselwood/orbcalc/orbcore"
+	"github.com/emilyselwood/orbcalc/orbcore"
 	"strings"
 	"time"
 )

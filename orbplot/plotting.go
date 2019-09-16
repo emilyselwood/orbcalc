@@ -4,8 +4,8 @@ import (
 	"image/color"
 	"math"
 
-	"github.com/wselwood/orbcalc/orbcore"
-	"github.com/wselwood/orbcalc/orbdata"
+	"github.com/emilyselwood/orbcalc/orbcore"
+	"github.com/emilyselwood/orbcalc/orbdata"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"

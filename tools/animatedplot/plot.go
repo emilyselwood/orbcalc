@@ -13,11 +13,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/wselwood/gompcreader"
-	"github.com/wselwood/orbcalc/orbconvert"
-	"github.com/wselwood/orbcalc/orbcore"
-	"github.com/wselwood/orbcalc/orbdata"
-	"github.com/wselwood/orbcalc/orbplot"
+	"github.com/emilyselwood/gompcreader"
+	"github.com/emilyselwood/orbcalc/orbconvert"
+	"github.com/emilyselwood/orbcalc/orbcore"
+	"github.com/emilyselwood/orbcalc/orbdata"
+	"github.com/emilyselwood/orbcalc/orbplot"
 
 	"github.com/paulbellamy/ratecounter"
 

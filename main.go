@@ -10,9 +10,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/wselwood/gompcreader"
-	"github.com/wselwood/orbcalc/orbconvert"
-	"github.com/wselwood/orbcalc/orbcore"
+	"github.com/emilyselwood/gompcreader"
+	"github.com/emilyselwood/orbcalc/orbconvert"
+	"github.com/emilyselwood/orbcalc/orbcore"
 
 	"github.com/paulbellamy/ratecounter"
 )
