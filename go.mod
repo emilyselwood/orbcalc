@@ -10,3 +10,7 @@ require (
 )
 
 go 1.11
+
+replace (
+    github.com/emilyselwood/gompcreader => ../gompcreader
+)

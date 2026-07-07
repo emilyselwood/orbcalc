@@ -182,7 +182,7 @@ func stageRead(inputFile string, output chan *orbcore.Orbit, wg *sync.WaitGroup,
 		result, err = mpcReader.ReadEntry()
 	}
 	if err != io.EOF {
-		log.Fatal("error reading", err)
+		log.Fatal("error reading line ", count, " -> ", err)
 	}
 }
 

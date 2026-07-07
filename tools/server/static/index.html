@@ -1,59 +1,77 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-	<head>
-		<meta charset=utf-8>
+    <head>
+        <meta charset="utf-8" />
         <title>Asteroids Orbits</title>
-        <link href="css/orbviewer.css" rel="stylesheet" type="text/css" >
-	</head>
-	<body>
+        <link href="css/orbviewer.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
         <div id="container"></div>
         <div id="clickLabel">
             <a id="asteroidLink" target="_blank"></a>
         </div>
         <div id="helpbutton" class="helpbutton" onclick="helpOn()">?</div>
-        <div id="tourbutton" class="tourbutton" onclick="toggleTour()">T</div>
+        <div id="tourbutton" class="tourbutton">T</div>
         <div id="helpcontainer" class="overlay" onclick="helpOff()">
             <h1>Orb Viewer</h1>
             <p>
-                This is a model of the entire solar system with every known asteroid marked. 
-                Each point shows the real position of an asteroid. The lines show the orbits
-                of the major planets.
+                This is a model of the entire solar system with every known
+                asteroid marked. Each point shows the real position of an
+                asteroid. The lines show the orbits of the major planets.
             </p>
             <p>
-                Left click and drag to look around. Right click and drag to move around. 
-                Scroll to zoom in and out. 
+                Left click and drag to look around. Right click and drag to move
+                around. Scroll to zoom in and out.
             </p>
-			<p>
-				There is a 'T' button in the top right next to the help button that will enable a flight through the solar system.
-			</p>
             <p>
-                The data is sourced from the <a href="https://www.minorplanetcenter.net/" target="_blank">Minor planets
-                    center</a> and processed and visualised by <a href="https://twitter.com/emilywselwood" target="_blank">Emily Selwood</a>
-                    and collaborators using <a href="https://github.com/emilyselwood/orbcalc" target="_blank">Orb Calc</a> to give positions.
-                This project is open source and can be found on
-                <a href="https://github.com/emilyselwood/orbviewer" target="_blank">github</a>
+                There is a 'T' button in the top right next to the help button
+                that will enable a flight through the solar system.
             </p>
-                
+            <p>
+                The data is sourced from the
+                <a href="https://www.minorplanetcenter.net/" target="_blank"
+                    >Minor planets center</a
+                >
+                and processed and visualised by
+                <a href="https://twitter.com/emilywselwood" target="_blank"
+                    >Emily Selwood</a
+                >
+                and collaborators using
+                <a
+                    href="https://github.com/emilyselwood/orbcalc"
+                    target="_blank"
+                    >Orb Calc</a
+                >
+                to give positions. This project is open source and can be found
+                on
+                <a
+                    href="https://github.com/emilyselwood/orbviewer"
+                    target="_blank"
+                    >github</a
+                >
+            </p>
+
             <a onclick="helpOff()">Back</a>
-
         </div>
-
-        
-        <script src="https://cdn.jsdelivr.net/gh/brianpeiris/three.js@38eb15da0442eebf41ef4be6af1135440e7d547d/build/three.min.js"></script>
-        <script src="js/OrbitControls.js"></script>
-        <script src="https://cdn.jsdelivr.net/gh/brianpeiris/three.js@38eb15da0442eebf41ef4be6af1135440e7d547d/examples/js/libs/stats.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/gh/brianpeiris/three.js@38eb15da0442eebf41ef4be6af1135440e7d547d/examples/js/WebGL.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/16.3.5/Tween.min.js"></script>
-        <script src="js/WebVR.js"></script>
-        <script src="js/orbviewer.js"></script>
-		<script>
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
+                    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/",
+                    "jeasings": "https://unpkg.com/jeasings@0.0.16/build/JEasings.js"
+                }
+            }
+        </script>
+        <script type="module" src="js/orbviewer.js"></script>
+        <script>
             function helpOn() {
-                document.getElementById("helpcontainer").style.display = "block";
+                document.getElementById("helpcontainer").style.display =
+                    "block";
             }
 
             function helpOff() {
                 document.getElementById("helpcontainer").style.display = "none";
             }
-		</script>
-	</body>
+        </script>
+    </body>
 </html>
